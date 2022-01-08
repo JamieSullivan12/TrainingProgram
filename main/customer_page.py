@@ -2,7 +2,7 @@ import main
 import tkinter as tk
 import tkinter.messagebox
 import pandas as pd
-
+from datetime import datetime,date
 
 '''
 Contains the code for the customer page. On this page, the user can access all customer details and change them
@@ -21,12 +21,15 @@ class CustomerPage(tk.Frame):
         # create datastructure from raw data using pandas
         customer_df = pd.read_csv("tempdata1.csv")
         customer_df = customer_df.fillna('') #replace empty fields (which would normally show NaN) with ""
+        customer_df['DoB'] = pd.to_datetime(customer_df['DoB'], dayfirst=True, errors='coerce')
+
         # print all the headers across the screen at the top (will reference each column in the table created below)
         for l,header in enumerate(list(customer_df)): #list(customer_df) returns all headings
             col_heading = tk.Label(self.frame, text=header, bg=self.controller.backgroundColor, fg='black', font=self.controller.p1)
             # only add padding to first element
             if l==0:col_heading.grid(row=1,column=l, padx=(10,0), pady=(10,0), sticky="w")
             else:col_heading.grid(row=1,column=l, pady=(10,0), sticky="w")
+
 
         table_array = []
         # loop through each row of datastructure
@@ -39,8 +42,12 @@ class CustomerPage(tk.Frame):
                 # add the textbox to the screen (10px padding on the first column of each row)
                 if g == 0: self.e.grid(row=i+2,column=g, padx=(10,0))
                 else: self.e.grid(row=i+2,column=g)
-                # insert the data into the respective box
-                self.e.insert(tk.END,str(value))
+                
+                if self.indexes[g]=="DoB":
+                    self.e.insert(tk.END, f'{value.day}/{value.month}/{value.year}')
+                else:
+                    # insert the data into the respective box
+                    self.e.insert(tk.END,str(value))
                 sub_table_array.append(self.e)
             table_array.append(sub_table_array)
         return customer_df, table_array
@@ -56,7 +63,7 @@ class CustomerPage(tk.Frame):
     '''
     def save_changes(self,customer_df, table_array):
         # library used when accessing the pandas library (column name required instead of index)
-        indexes = {0:"Name",1:"DoB",2:"Goals",3:"Email"}
+        
         save_log = ""
         changes_made = False
         #loop through each row in the customer datastructure
@@ -64,18 +71,42 @@ class CustomerPage(tk.Frame):
             # loop through each column for each row in the customer datastructure
             for g,value in enumerate(values):
                 value = str(value)
-                # only save the changes which exist
-                if value != table_array[i][g].get():
-                    #at the point (i - row,g - column), change the value to what currently sits in the corresponding textbox on the tkinter widget
-                    try:
-                        customer_df.at[i,indexes[g]]=str(table_array[i][g].get())
-                        save_log += "Customer: " + table_array[i][0].get() + "; Column: " + indexes[g] + " -> '" + table_array[i][g].get() + "'\n"
-                        changes_made = True #flag used at the end
+                print(self.indexes[g]=="DoB")
+                # if the field being updated is a date, slightly more logic is required
+                if self.indexes[g]=="DoB":
+                    override_cont = False #used to overridde if old date is incorrect format (so it can be changed)
+                    cancel = False # if the new date is incorrect, the change will be cancelled
+                    old_datetime_object = "NaN"
+                    new_datetime_object = "NaN"
+                    try: # making the old date as a datetime object (this is the date that currently sits in the pandas dataset)
+                        old_datetime_object = pd.to_datetime(str(value), format="%Y-%m-%d")
                     except ValueError as e:
-                        # a field cannot be empty because it will throw an error. revert the change if this occurs
-                        tkinter.messagebox.showerror(title="Empty field invalid", message="Customer: " + table_array[i][0].get() + "; Column: " + indexes[g] + " - cannot be empty. Your change will now be reverted")
-                        table_array[i][g].insert(tk.END,str(value))
-                    
+                        override_cont = True
+                    try: #making the new date as a datetime object (this is the date that the user entered). If it is incorrect, the change will be cancelled.
+                        new_datetime_object = pd.to_datetime(str(table_array[i][g].get()), format="%d/%m/%Y")
+                    except ValueError as e:
+                        cancel = True
+                        tkinter.messagebox.showerror(title="Unable to save changes", message=f"The date entered for {table_array[i][0].get()} is invalid. This customer will not be updated.")
+
+                    if  override_cont or old_datetime_object != new_datetime_object and not cancel:
+                        new_date = new_datetime_object
+                        customer_df.at[i,self.indexes[g]]=new_date
+                        save_log += "Customer: " + table_array[i][0].get() + "; Column: " + self.indexes[g] + " -> '" + table_array[i][g].get() + "'\n"
+                        changes_made = True
+                
+                else:
+                    # only save the changes which exist
+                    if value != table_array[i][g].get():
+                        try:
+                            #at the point (i - row,g - column), change the value to what currently sits in the corresponding textbox on the tkinter widget
+                            customer_df.at[i,self.indexes[g]]=str(table_array[i][g].get())
+                            save_log += "Customer: " + table_array[i][0].get() + "; Column: " + self.indexes[g] + " -> '" + table_array[i][g].get() + "'\n"
+                            changes_made = True #flag used at the end
+                        except ValueError as e:
+                            # a field cannot be empty because it will throw an error. revert the change if this occurs
+                            tkinter.messagebox.showerror(title="Empty field invalid", message="Customer: " + table_array[i][0].get() + "; Column: " + indexes[g] + " - cannot be empty. Your change will now be reverted")
+                            table_array[i][g].insert(tk.END,str(value))
+
         #logging and error message purposes
         if changes_made:
             try:
@@ -92,6 +123,7 @@ class CustomerPage(tk.Frame):
         self.controller.tkRoot.title("Training App > Customers")
 
     def __init__(self, parent, controller):
+        self.indexes = {0:"Name",1:"DoB",2:"Goals",3:"Email"}
         # initial setup
         tk.Frame.__init__(self, parent)
         self.controller = controller
