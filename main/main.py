@@ -3,11 +3,18 @@ import pathlib
 import tkinter.ttk as ttk
 import tkinter.font
 from customer_page import *
-
+from add_customer import *
+import pandas
 
 class TrainingApp(tk.Tk):
 
     def create_frames(self):
+        try:
+            for f in self.frames():
+                f.Destroy()
+        except Exception as e:
+            pass
+
         self.frames = {}
         F = StartPage
         page_name = F.__name__
@@ -17,8 +24,10 @@ class TrainingApp(tk.Tk):
 
         #Put all the canvases in the same location in the container
         frame.grid(row=0, column=0, sticky='nsew')
+        
+        
 
-        for F in (StartPage, CustomerPage):
+        for F in (StartPage, CustomerPage, AddCustomerPage):
             page_name = F.__name__
             frame = F(parent=self.container, controller=self)
 
@@ -66,6 +75,12 @@ class TrainingApp(tk.Tk):
         self.buttonClick = "#B9B7B7"
         self.textForeground = "#000000"
 
+        # create datastructure from raw data using pandas
+        self.customer_df = pd.read_csv("tempdata1.csv")
+        self.customer_df = self.customer_df.fillna('') #replace empty fields (which would normally show NaN) with ""
+        self.customer_df['DoB'] = pd.to_datetime(self.customer_df['DoB'], dayfirst=True, errors='coerce')
+
+        
         self.h1 = tkinter.font.Font(family="Helvlevtica",size=19)
         self.h2 = tkinter.font.Font(family="Helvlevtica",size=16)
         self.p1 = tkinter.font.Font(family="Helvlevtica",size=14)
@@ -99,6 +114,8 @@ class TrainingApp(tk.Tk):
 
         self.bind_all("<MouseWheel>", on_scroll)
     
+
+
     
     '''
     Show a canvas for the given page name
