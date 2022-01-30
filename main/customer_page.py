@@ -10,58 +10,6 @@ Contains the code for the customer page. On this page, the user can access all c
 '''
 class CustomerPage(tk.Frame):
 
-    '''
-    Function: Read customer data from temporary CSV file (which is downloaded and later uploaded to the cloud). Create the table on the TKinter page
-    IN:
-    - self
-    OUT:
-    - customer_df: the pandas datastructure containing customer data
-    - table_array: a 2D array of all the text boxes in the grid on the tkinter window
-    '''
-    def read_customer_data(self):
-
-        indexes = {}
-        # print all the headers across the screen at the top (will reference each column in the table created below)
-        for l,header in enumerate(list(self.controller.customer_df)): #list(customer_df) returns all headings
-            indexes[header]=l
-
-        for g, heading in enumerate(["Name","Date Of Birth","Goals","Email"]):
-            col_heading = tk.Label(self.frame, text=heading, bg=self.controller.backgroundColor, fg='black', font=self.controller.p1)
-            if g==0:col_heading.grid(row=1,column=g, padx=(10,0), pady=(10,0), sticky="w")
-            else:col_heading.grid(row=1,column=g, pady=(10,0), sticky="w")
-
-        customers = {}
-        table_array = []
-        # loop through each row of datastructure
-        for i,values in self.controller.customer_df.iterrows():
-
-            name = values[indexes["Name"]]
-            DoB = values[indexes["DoB"]]
-            goals = values[indexes["Goals"]]
-            email = values[indexes["Email"]]
-            id = values[indexes["ID"]]
-
-            c = Customers(id,name,DoB,goals,email,i)
-            customers[id]=c
-
-            self.name_textbox = tk.Entry(self.frame, width=20, fg='blue',font=("Arial",16,"bold"))
-            self.name_textbox.insert(tk.END, name)
-            self.name_textbox.grid(row=i+2,column=0, padx=(10,0))
-            self.DoB_textbox = tk.Entry(self.frame, width=20, fg='blue',font=("Arial",16,"bold"))
-            self.DoB_textbox.insert(tk.END, f'{DoB.day}/{DoB.month}/{DoB.year}')
-            self.DoB_textbox.grid(row=i+2,column=1)
-            self.goals_textbox = tk.Entry(self.frame, width=20, fg='blue',font=("Arial",16,"bold"))
-            self.goals_textbox.insert(tk.END, goals)
-            self.goals_textbox.grid(row=i+2,column=2)
-            self.email_textbox = tk.Entry(self.frame, width=20, fg='blue',font=("Arial",16,"bold"))
-            self.email_textbox.insert(tk.END, email)
-            self.email_textbox.grid(row=i+2,column=3)
-
-            c.add_table_row(self.name_textbox,self.DoB_textbox,self.goals_textbox,self.email_textbox)
-
-            table_array.append([self.name_textbox,self.DoB_textbox,self.goals_textbox,self.email_textbox])
-
-        return customers
 
 
     '''

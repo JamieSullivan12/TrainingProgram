@@ -1,10 +1,12 @@
-Name,DoB,Goals,Email,ID
-Jamie Sullivan1,2020-05-22,,jsullivan22@student.sacs.nsw.edu.au,68783169
-Mr Thill,2004-02-23,,mthill@sacs.nsw.edu.au,17250097
-Nick Langford,2004-02-24,,nlangford22@student.sacs.nsw.edu.au,78058325
-Andrew Amos,2004-02-25,,aamos22@student.sacs.nsw.edu.au,61902057
-Louis Vahl,2004-02-26,NaT,NaT,74957906
-qwertyuiop,1996-04-22,,whrt,65927969
-poiuytrewq,1996-04-22,,whrt,16459639
-d,2005-02-22,,d,85236769
-f,2005-03-22,,a,12977391
+Name,DoB,Goals,Email,ID,Ability Level,Categories
+Jamie Sullivan12,2020-05-22,,jsullivan22@student.sacs.nsw.edu.au,68783169.0,1.0,[4]
+Mr Thill,2004-02-23,,mthill@sacs.nsw.edu.au,17250097.0,2.0,
+Nick Langford,2004-02-24,,nlangford22@student.sacs.nsw.edu.au,78058325.0,11.0,
+Andrew Amos,2004-02-25,,aamos22@student.sacs.nsw.edu.au,61902057.0,5.0,
+Louis Vahl,2004-02-26,NaT,NaT,74957906.0,4.0,
+qwertyuiop,1996-04-22,,whrt,65927969.0,,
+poiuytrewq,1996-04-22,,whrt,16459639.0,,"[3, 4]"
+d,2005-02-22,,d,85236769.0,,
+f,2005-03-22,,a,12977391.0,,
+s,2000-02-22,,f,,,
+agee,2004-07-06,,f,,,

@@ -4,7 +4,11 @@ import tkinter.ttk as ttk
 import tkinter.font
 from customer_page import *
 from add_customer import *
+from edit_customer_data import *
 import pandas
+import data_access
+
+
 
 class TrainingApp(tk.Tk):
 
@@ -27,7 +31,7 @@ class TrainingApp(tk.Tk):
         
         
 
-        for F in (StartPage, CustomerPage, AddCustomerPage):
+        for F in (StartPage, CustomerPage, AddCustomerPage,EditCustomerPage):
             page_name = F.__name__
             frame = F(parent=self.container, controller=self)
 
@@ -55,12 +59,17 @@ class TrainingApp(tk.Tk):
         self.start_height = 450
         self.minsize(width=self.start_width, height= self.start_height)
 
+        self.current_frame_object=self
+
         # all the canvases will be placed on the container frame. The one we want visible will be raised on top of the others
         self.container = tk.Frame(self, bg="red")
         self.container.pack(side='top', fill='both', expand=True)
         self.container.pack_propagate(0)
         self.container.grid_rowconfigure(0,weight=1)
         self.container.grid_columnconfigure(0,weight=1)
+
+        
+        data_access.load_data()
 
         # this path is used for program data (in a different folder)
         path = pathlib.Path(__file__).parent.resolve()
@@ -108,12 +117,13 @@ class TrainingApp(tk.Tk):
 
         self.config(menu=self.main_menu)
 
+        
 
         def on_scroll(event):
             self.current_frame_object.scrollable_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
         self.bind_all("<MouseWheel>", on_scroll)
-    
+
 
 
     
@@ -126,6 +136,9 @@ class TrainingApp(tk.Tk):
         frame.set_heading()
         self.current_frame_object = frame
         frame.tkraise()
+    
+
+
 
 
 '''
@@ -175,7 +188,11 @@ class StartPage(tk.Frame):
         placeholder_button_2 = tk.Button(frame, text='PLACEHOLDER',borderwidth=0,width=15, height=1,font=self.controller.p3, fg="#ffffff", bg=self.controller.buttonBackground,activebackground=self.controller.buttonClick,activeforeground="#ffffff", relief=tk.FLAT)
         placeholder_button_2.grid(row=3,column=0, padx=50, pady=15)
 
+        
+
 
 if __name__ == '__main__':
     trainingApp = TrainingApp()
+    
     trainingApp.mainloop()
+    

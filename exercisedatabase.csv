@@ -1,0 +1,41 @@
+ID,Descriptor,Type,Category,Difficulty
+1,Barbell Squats,1,1,3
+2,Goblet Squats,1,1,2
+3,Seated Squats,1,1,1
+4,Frog Squats,1,1,1
+5,Dead Lifts,1,1,2
+6,Step-Ups,2,1,1
+7,Bulgarian Squats,2,1,1
+8,Walking Lunges,2,1,1
+9,Alternating Static Lunges,2,1,1
+10,TRX Pistol Squats,2,1,0
+11,TRX Jumping Squats,1,1,0
+12,Seated Pistol Squats,1,1,1
+13,Bicep Curls,1,2,1
+14,TRX Close Grip Pull-Ups,1,2,0
+15,TRX Wide Grip Pull-Ups,1,2,0
+16,Single Arm Bent Over Row,2,2,2
+17,Bench Pull-Ups,1,2,0
+18,Bench Press,1,3,3
+19,Push-Ups,1,3,0
+20,Dips,1,3,0
+21,Shoulder Press,1,3,2
+22,Lateral Raises,1,3,1
+23,Front Raises,1,3,1
+24,Skull Crushes,1,3,2
+25,Ab Climbers,2,4,0
+26,Plank Walk-outs,1,4,0
+27,Ab Roller,1,4,0
+28,Front Elbow Plank,3,4,0
+29,Front Hands Plank,3,4,0
+30,Side Plank,4,4,0
+31,Ball Tucks,1,4,0
+32,Russian Twist,2,4,1
+33,Ball Toe Taps,2,4,0
+34,Single Battle Ropes,1,5,0
+35,Double Battle Ropes,2,5,0
+36,Rope Jump Slams,1,5,0
+37,Ball Slams,1,5,1
+38,Burpees,1,5,0
+39,Sprints,5,5,0
+40,Shuttle Runs,1,5,0
