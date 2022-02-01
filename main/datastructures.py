@@ -64,20 +64,25 @@ class CustomerData():
             self.email = row[indexes["Email"]]
             self.ID = row[indexes["ID"]]
             self.ability_level = row[indexes["Ability Level"]]
+            self.session_plans_string = row[indexes["Session Plans"]]
+            print(self.name)
+            if self.session_plans_string != "":self.session_plans = json.loads(self.session_plans_string)
+            else:self.session_plans=[]
+
 
             self.categories_string = row[indexes["Categories"]]
             if self.categories_string != "":self.categories = json.loads(row[indexes["Categories"]])
             else:self.categories=[]
 
         def writetofile(self):
-            print("i got here")
-            print(str(self.categories))
             self.pandas_data.at[self.pandas_index,"Name"]=self.name
             self.pandas_data.at[self.pandas_index,"DoB"]=self.DoB
             self.pandas_data.at[self.pandas_index,"Goals"]=self.goals
             self.pandas_data.at[self.pandas_index,"Email"]=self.email
             self.pandas_data.at[self.pandas_index,"Categories"]=str(self.categories)
+            self.pandas_data.at[self.pandas_index,"Session Plans"]=json.dumps(self.session_plans)
             self.pandas_data.to_csv("tempdata1.csv", index=False)
+            
 
     def __init__(self):
         self.customer_file = pd.read_csv("tempdata1.csv")

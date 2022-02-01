@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-import homepage, customerpage, addcustomerpage, moreinfopage
+import homepage, customerpage, addcustomerpage, moreinfopage, sessionplanreview
 import pandas as pd
 import datastructures
 
@@ -93,7 +93,7 @@ class GUI(ttk.Frame):
         self.ignore_setup=True 
         #
         self.frames={}
-        pages = [homepage.HomePage,customerpage.CustomerPage,addcustomerpage.AddCustomerPage, moreinfopage.MoreInfoPage]
+        pages = [homepage.HomePage,customerpage.CustomerPage,addcustomerpage.AddCustomerPage, moreinfopage.MoreInfoPage,sessionplanreview.SessionPlanReviewPage]
 
 
         # setup all page classes

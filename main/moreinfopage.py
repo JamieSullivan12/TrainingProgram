@@ -11,6 +11,42 @@ class MoreInfoPage(tk.Frame):
             self.label.grid(row=row, column=column)
             self.entry.grid(row=row+1,column=column)
 
+    class SessionPlanRow():
+        def see_session_details_clicked(self):
+            self.controller.controller.frames["SessionPlanReviewPage"].injectdata(self.sessionplan_json, self.controller.customer)
+            self.controller.controller.showwindow("SessionPlanReviewPage")
+
+        def __init__(self,controller, sessionplan_json,row):
+            self.sessionplan_json=sessionplan_json
+            self.controller=controller
+            self.row_container = ttk.Frame(self.controller.session_frame)
+
+            self.heading=ttk.Label(self.row_container,text=f"Session Plan Generated: {sessionplan_json['timestamp']}")
+            self.sesessiondetails_button = ttk.Button(self.row_container,text="See Session Details",command=self.see_session_details_clicked)
+            self.sesessiondetails_button.grid(row=0,column=1,padx=30,pady=20)
+            self.seperator = ttk.Separator(orient="horizontal")
+            self.seperator.grid(row=1,column=0,sticky="ew")
+            self.heading.grid(row=0,column=0,padx=20,pady=10,sticky="w")
+            self.row_container.grid(row=row,column=0,stick="ew")
+
+
+
+    def create_list_of_sessions(self):
+        try: 
+            self.session_frame.grid_forget()
+            self.session_frame.destroy()
+        except Exception as e:pass
+        self.session_frame = ttk.LabelFrame(self.frame,text="Session Plans")
+        self.session_frame.grid(row=3,column=0,columnspan=2)
+        
+        sessionplan_list=[]
+        for session_plan in self.customer.session_plans:
+            sessionplan_list.append(session_plan)
+        
+        sessionplan_rowobjects = []
+        for row,session_plan in enumerate(sessionplan_list):
+            sessionplan_row= self.SessionPlanRow(self,session_plan,row)
+            sessionplan_rowobjects.append(sessionplan_row)
 
     def injectdata(self,customer):
         self.customer=customer
@@ -21,7 +57,12 @@ class MoreInfoPage(tk.Frame):
             self.checkbuttons[checkbutton_id][1].set(0)
         for category in self.customer.categories:
             self.checkbuttons[category][1].set(1)
-    
+        
+        self.create_list_of_sessions()
+
+
+
+
     def update_goals(self):
         category_list = []
         for category_id in self.checkbuttons:
@@ -33,6 +74,8 @@ class MoreInfoPage(tk.Frame):
     def create_sessionplan(self):
         sessioncreator_obj = createtrainingplan.TrainingPlanCreator(self.customer, self.controller)
         sessioncreator_obj.createtrainingplan()
+        self.controller.frames["SessionPlanReviewPage"].injectdata(sessioncreator_obj.sessionplan.trainingplanjson, self.customer)
+        self.controller.showwindow("SessionPlanReviewPage")
 
     def set_heading(self):
         self.controller.tkRoot.title("Training App > Edit Customer Data")
