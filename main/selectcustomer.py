@@ -4,9 +4,9 @@ class SelectCustomerPage(ttk.Frame):
     def set_heading(self):
         self.controller.root.title("Training Program")
 
-    def search(self):
-        search = self.search_texbox.get()
-        for
+    #def search(self):
+    #    search = self.search_texbox.get()
+    #    for
 
 
     def __init__(self, controller):

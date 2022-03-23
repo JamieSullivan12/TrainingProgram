@@ -13,36 +13,42 @@ Contains the code for the customer page. On this page, the user can access all c
 '''
 class CustomerPage(tk.Frame):
 
-    class CustomerRow():
-        
+    """
+    Object containing only information for each customer row seen in the customers user interface page
+    """
+    class CustomerRow(): 
         def customer_moreinfo(self,event):
+            """
+            Injects data for this customer object into the MoreInfoPage (using abstracted function .injectdata). Then switches
+            to that page using the showwindow function from app.py
+            """
             self.controller.controller.frames["MoreInfoPage"].injectdata(self.customer)
             self.controller.controller.showwindow("MoreInfoPage")
-
-
         def bindframe(self,frame,sequence,func):
             frame.bind(sequence, func)
             for child in frame.winfo_children():
                 child.bind(sequence, func)
-
         def __init__(self,controller,row_num,customer):
             self.customer=customer
             self.controller=controller
 
+            # creating child frame in which individual customer rows will appear
             self.customer_frame = ttk.Frame(self.controller.frame)
             self.customer_frame.columnconfigure(0, weight=3)
             self.customer_frame.columnconfigure(1, weight=1)
+            # horizontal line separating customer rows
             self.bottom_seperator = ttk.Separator(self.customer_frame,orient='horizontal')
 
+            # customer name and date of birth
             self.name_label = ttk.Label(self.customer_frame,text=customer.name)
             self.name_label.grid(row=0, column=0, padx=(20,60),pady=20)
-
             self.DoB_label = ttk.Label(self.customer_frame, text=f'{customer.DoB.day}/{customer.DoB.month}/{customer.DoB.year}')
             self.DoB_label.grid(row=0, column=1)
 
             self.bottom_seperator.grid(row=2,column=0,columnspan=100,sticky="ew")
-            self.customer_frame.grid(row=row_num,column=0,columnspan=100,sticky="ew",padx=20)
+            self.customer_frame.grid(row=row_num,column=0,columnspan=100,sticky="ew",padx=40)
 
+            # on double click, run the more info function (see function pydocs)
             self.bindframe(self.customer_frame,"<Double-Button-1>",self.customer_moreinfo)
 
 
@@ -86,54 +92,46 @@ class CustomerPage(tk.Frame):
             except PermissionError as e:
                 tkinter.messagebox.showerror(title="Unable to save changes", message="Please ensure that the core data file is not open and try again.")
     
+
     def searchfunction(self):
-
-
+        """
+        Prints all customers in the database. Will only include what is in the searchbox (defined class initialisation).
+        NOTE: if searchbox is empty, the filter will include all customers
+        """
         search_filter = self.search_texbox.get()
 
-
-
+        # remove all current customer rows printed on screen (they will be replaced)
         for row in self.listofrows:
-            print(row)
             row.customer_frame.grid_forget()
-        
         self.listofrows=[]
-
+        
+        # incremental value to print each customer on a new row in the tkinter window
         row_num=2
+        # for each customer in the dataset, if it satisfies the search requirements, initialise and append the new customer row to a list
         for customer in self.controller.customerdata_dict:
-
             if search_filter=="" or search_filter.lower() in self.controller.customerdata_dict[customer].name.lower() or search_filter.lower() in self.controller.customerdata_dict[customer].email.lower():
                 self.listofrows.append(self.CustomerRow(self,row_num,self.controller.customerdata_dict[customer]))
                 row_num+=1
-        #print(self.listofrows)
+
+
 
     def set_heading(self):
         self.controller.tkRoot.title("Training App > Customers")
 
     def __init__(self, controller):
         tk.Frame.__init__(self)
-
         # initial setup
         self.controller = controller
         self.frame = ttk.Frame(self.controller.frame_obj.scrollable_frame)
-
-        self.listofrows=[]
         title = ttk.Label(self.frame, text="Customers")
-        title.grid(row=0,column=0, padx=10, pady=(10,0), sticky="w")
+        title.grid(row=0,column=0, padx=(40,10), pady=(10,0), sticky="w")
 
-        # to be used when the user changes any fields in the table on screen
-        #save_changes_button = ttk.Button(self.frame, text='Save Changes',command=lambda:self.save_changes(customers))
-        #save_changes_button.grid(row=0,column=1, padx=50, pady=15)
-
-        # button links to page where a new customer can be created
-        #addcustomer_button = ttk.Button(self.frame, text='Add Customer',command=lambda:self.controller.showwindow("AddCustomerPage"))
-        #addcustomer_button.grid(row=0,column=2, padx=50, pady=15)
 
         self.search_texbox = ttk.Entry(self.frame, width=50)
-        self.search_texbox.grid(row=1,column=0)
-
-        
+        self.search_texbox.grid(row=1,column=0,padx=(40,0))
         self.search_button = ttk.Button(self.frame,text="Search", width=30,command=lambda:self.searchfunction())
         self.search_button.grid(row=1,column=1, padx=(20,10),pady=10)
 
+        # used to store all customer row objects
+        self.listofrows=[]
         self.searchfunction()

@@ -1,5 +1,5 @@
 #accessing AWS bucket
-import boto3
+#import boto3
 import os
 
 def s3accesscode():

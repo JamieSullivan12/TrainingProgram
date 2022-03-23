@@ -36,24 +36,24 @@ class GUI(ttk.Frame):
     def __init__(self,parent,tracker):
         self.parent=parent
         self.tracker=tracker
-        self.container = ttk.Frame(self.parent)
 
+        # setup parent container and child frame which is horizontally and vertically scrollable
+        self.container = ttk.Frame(self.parent)
         self.container.grid_rowconfigure(0,weight=1)
         self.container.grid_columnconfigure(0,weight=1)
-        # create datastructure from raw data using pandas
-
-        self.customerdata_obj = datastructures.CustomerData()
-        self.customerdata_dict = self.customerdata_obj.customerdata
-
-        self.data_obj = datastructures.ExerciseData()
-        self.exercisedata_dict = self.data_obj.exercisedata
-
-        self.categorydata_dict = self.data_obj.categoriesdata
-
         self.frame_obj = self.CreateScrollableFrame(self)
         self.tracker.link_scrollable_frame(self.frame_obj)
 
-        #configuring the menu
+        # initialising customer data
+        self.customerdata_obj = datastructures.CustomerData()
+        self.customerdata_dict = self.customerdata_obj.customerdata
+        # initialising exercises data
+        self.data_obj = datastructures.ExerciseData()
+        self.exercisedata_dict = self.data_obj.exercisedata
+        # initialising category data
+        self.categorydata_dict = self.data_obj.categoriesdata
+
+        # configure the navigation menu/bar
         self.menubar = tk.Menu(self.parent)
         self.optionsmenu = tk.Menu(self.menubar, tearoff=False)
         self.optionsmenu.add_command(label="Change Theme", command=lambda:self.change_theme())
@@ -64,11 +64,10 @@ class GUI(ttk.Frame):
         self.menubar.add_cascade(label="Navigate", menu=self.navigate)
         self.parent.config(menu=self.menubar)
         
+        # create all pages that the user can navigate to
         self.setupwindows()
+        # only show the home page (initial page the user is greeted with)
         self.showwindow("HomePage")
-
-
-
 
         self.container.pack(side='top', fill='both', expand=True)
     '''
