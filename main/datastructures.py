@@ -65,10 +65,9 @@ class CustomerData():
             self.ID = row[indexes["ID"]]
             self.ability_level = row[indexes["Ability Level"]]
             self.session_plans_string = row[indexes["Session Plans"]]
-            print(self.name)
+
             if self.session_plans_string != "":self.session_plans = json.loads(self.session_plans_string)
             else:self.session_plans=[]
-
 
             self.categories_string = row[indexes["Categories"]]
             if self.categories_string != "":self.categories = json.loads(row[indexes["Categories"]])
@@ -80,9 +79,14 @@ class CustomerData():
             self.pandas_data.at[self.pandas_index,"Goals"]=self.goals
             self.pandas_data.at[self.pandas_index,"Email"]=self.email
             self.pandas_data.at[self.pandas_index,"Categories"]=str(self.categories)
+            print(self.session_plans)
             self.pandas_data.at[self.pandas_index,"Session Plans"]=json.dumps(self.session_plans)
             self.pandas_data.to_csv("tempdata1.csv", index=False)
-            
+        
+        def removesessionplan(self,session_plan):
+            for plan in self.session_plans:
+                if plan["timestamp"] == session_plan["timestamp"]:
+                    self.session_plans.remove(plan)
 
     def __init__(self):
         self.customer_file = pd.read_csv("tempdata1.csv")
@@ -115,7 +119,7 @@ class Customers():
         #ability_level_groups=["Bicep Curls","Forward Lunge","Sit-Ups","Burpees","Deadlifts","Lateral Raises","Calf Raises"]
         #ability_level=json.loads(ability_level)
         #self.ability_levels=ability_level
-        print(self.ability_level)
+
     
     '''
     FUNCTION: Add a set of tkinter textbox objects to each contract. Used to access the value of any changes the user has typed into those textboxes

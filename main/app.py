@@ -113,10 +113,9 @@ class GUI(ttk.Frame):
     def showwindow(self, frame_name):
         if not self.ignore_setup:
             
-            #print(self.frames)
             for frame in self.frames:
                 self.frames[frame].frame.grid_forget()
-                print(self.frames[frame])
+
             self.current_frame = frame_name
             frame = self.frames[frame_name]
             self.current_frame_object = frame

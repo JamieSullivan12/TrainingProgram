@@ -1,7 +1,9 @@
 from cgitb import text
+from email import message
 import tkinter as tk
 from tkinter import ttk
 import createtrainingplan
+import selectdate
 class MoreInfoPage(tk.Frame):
     
     class GoalsInput():
@@ -28,6 +30,8 @@ class MoreInfoPage(tk.Frame):
             self.seperator.grid(row=1,column=0,sticky="ew")
             self.heading.grid(row=0,column=0,padx=20,pady=10,sticky="w")
             self.row_container.grid(row=row,column=0,stick="ew")
+
+
 
 
 
@@ -73,9 +77,28 @@ class MoreInfoPage(tk.Frame):
 
     def create_sessionplan(self):
         sessioncreator_obj = createtrainingplan.TrainingPlanCreator(self.customer, self.controller)
-        sessioncreator_obj.createtrainingplan()
+        sessioncreator_obj.createtrainingplan(circuits=self.number_of_circuits, supersets=self.number_of_supersets, sets=self.number_of_sets, planned_date = self.planned_date)
         self.controller.frames["SessionPlanReviewPage"].injectdata(sessioncreator_obj.sessionplan.trainingplanjson, self.customer)
         self.controller.showwindow("SessionPlanReviewPage")
+    
+    
+    def changecircuitsvalue(self,*args):
+        try:
+            self.no_circuits_VALUE["text"] = int(self.no_circuits_SCALE.get())
+            self.number_of_circuits = int(self.no_circuits_SCALE.get())
+        except Exception as e: pass
+    def changesupersetsvalue(self,*args):
+        try:
+            self.no_supersets_VALUE["text"] = int(self.no_supersets_SCALE.get())
+            self.number_of_supersets = int(self.no_supersets_SCALE.get())
+        except Exception as e: pass
+
+    def changesetsvalue(self,*args):
+        try:
+            self.no_sets_VALUE["text"] = int(self.no_sets_SCALE.get())
+            self.number_of_sets = int(self.no_sets_SCALE.get())
+        except Exception as e: pass
+
 
     def set_heading(self):
         self.controller.tkRoot.title("Training App > Edit Customer Data")
@@ -113,9 +136,63 @@ class MoreInfoPage(tk.Frame):
         
         self.goalscheckbutton_frames.grid(row=1,column=1)
 
-        self.createsessionplan_button = ttk.Button(self.frame, text='Create Training Plan',command=lambda:self.create_sessionplan())
-        self.createsessionplan_button.grid(row=2,column=1, padx=50, pady=15)
+        self.create_training_plan_frame = ttk.LabelFrame(self.frame, text="Create Training Plan")
+
+        ### CREATING THE CREATE TRAINING PLAN WINDOW - has three scrollers:
+        ### - Circuits: control the amount of circuits which will exist in the generated session
+        ### - Supersets: control the number of supersets will exist in each circuit
+        ### - Sets: control the number of sets will exist in each superset
+
+
+                
+        # creating the circuits label (appears to the left of the scale widget)
+        self.no_circuits_LABEL = ttk.Label(self.create_training_plan_frame, text="Circuits")
+        self.no_circuits_LABEL.grid(row=0,column=0,sticky="e",padx=(15,0))
+        # creating the circuits scale widget (pre-setting the value to 2)
+        self.no_circuits_SCALE = ttk.Scale(self.create_training_plan_frame, from_=1,to=6, command=self.changecircuitsvalue)
+        self.no_circuits_SCALE.set(2)
+        self.no_circuits_SCALE.grid(row=0,column=1,padx=(10,10),pady=10)
+        # creating the circuits label indicating the current value of the scale widget
+        self.no_circuits_VALUE = ttk.Label(self.create_training_plan_frame, text=int(self.no_circuits_SCALE.get()))
+        self.no_circuits_VALUE.grid(row=0,column=2,sticky="w",padx=(0,15))
+        self.number_of_circuits = int(self.no_circuits_SCALE.get())
+
+        # creating a widget for the number of supersets (structure same as that for circuits)
+        self.no_supersets_LABEL = ttk.Label(self.create_training_plan_frame, text="Supersets")
+        self.no_supersets_LABEL.grid(row=1,column=0,sticky="e",padx=(15,0))
+        self.no_supersets_SCALE = ttk.Scale(self.create_training_plan_frame, from_=2,to=8, command=self.changesupersetsvalue)
+        self.no_supersets_SCALE.set(3)
+        self.no_supersets_SCALE.grid(row=1,column=1,padx=(10,10),pady=10)
+        self.no_supersets_VALUE = ttk.Label(self.create_training_plan_frame, text=int(self.no_supersets_SCALE.get()))
+        self.no_supersets_VALUE.grid(row=1,column=2,sticky="w",padx=(0,15))
+        self.number_of_supersets = int(self.no_supersets_SCALE.get())
+
+
+        # creating a widget for the numebr of sets (structure same as that for circuits)
+        self.no_sets_LABEL = ttk.Label(self.create_training_plan_frame, text="Sets")
+        self.no_sets_LABEL.grid(row=2,column=0,sticky="e",padx=(15,0))
+        self.no_sets_SCALE = ttk.Scale(self.create_training_plan_frame, from_=2,to=8,command=self.changesetsvalue)
+        self.no_sets_SCALE.set(4)
+        self.no_sets_SCALE.grid(row=2,column=1,padx=(10,10),pady=10)
+        self.no_sets_VALUE = ttk.Label(self.create_training_plan_frame, text=int(self.no_sets_SCALE.get()))
+        self.no_sets_VALUE.grid(row=2,column=2,sticky="w",padx=(0,15))
+        self.number_of_sets = int(self.no_sets_SCALE.get())
+
+
+        self.planned_date = None
+        def dateselected(date):
+            self.planned_date = date
+            self.planned_date_label["text"] = "Selected Date: " + str(self.planned_date)
+
+        self.choose_planned_date_button = ttk.Button(self.create_training_plan_frame, text="Plan a Date", command=lambda:selectdate.dateselect("Select a date", dateselected))
+        self.planned_date_label = ttk.Label(self.create_training_plan_frame, text="No date selected")
+
+        self.choose_planned_date_button.grid(row=3,column=0,padx=15,pady=15,sticky="w")
+        self.planned_date_label.grid(row=4,column=0,padx=15, pady=15, sticky="w")
+
+        self.createsessionplan_button = ttk.Button(self.create_training_plan_frame, text='Create Training Plan',command=lambda:self.create_sessionplan())
+        self.createsessionplan_button.grid(row=5,column=0, padx=15, pady=15)
 
 
 
-        
+        self.create_training_plan_frame.grid(row=2,column=1, padx=50, pady=15)

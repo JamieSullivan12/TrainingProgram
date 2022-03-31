@@ -5,8 +5,7 @@ import os
 def s3accesscode():
 
     #basic credentials 
-    aws_access_key='AKIASKERJ7ZN2VU2TAVB'
-    aws_secret_access = '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'
+
 
     #Connect to the AWS s3 service
     client = boto3.client(
