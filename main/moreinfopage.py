@@ -2,6 +2,7 @@ from cgitb import text
 from email import message
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 import createtrainingplan
 import selectdate
 class MoreInfoPage(tk.Frame):
@@ -57,13 +58,26 @@ class MoreInfoPage(tk.Frame):
         self.title["text"]=f"Customer: {self.customer.name}"
         self.DoB_label["text"]=f"Date of Birth: {self.customer.DoB}"
         self.Email_Label["text"]=f"Email: {self.customer.email}"
+        self.AbilityLevel_Label["text"]=f"Ability Level: {self.customer.ability_level}"
         for checkbutton_id in self.checkbuttons:
             self.checkbuttons[checkbutton_id][1].set(0)
         for category in self.customer.categories:
             self.checkbuttons[category][1].set(1)
         
         self.create_list_of_sessions()
+        self.setup_customer_info_frame()
 
+    def setup_customer_info_frame(self):
+
+
+        
+        self.bindframe(self.Email_Label,"<Double-Button-1>",lambda e:self.textchangerequest(self.customerinfo_frame,self.Email_Label,self.customer.getEmail, self.customer.setEmail, prefix="Email: "))
+        self.bindframe(self.AbilityLevel_Label,"<Double-Button-1>",lambda e:self.textchangerequest(self.customerinfo_frame,self.AbilityLevel_Label,self.customer.getAbilityLevel, self.customer.setAbilityLevel, prefix="Ability Level: "))
+
+     
+
+        self.saveButton = ttk.Button(self.customerinfo_frame,text="Save Changes",command=self.customer.writetofile)
+        self.saveButton.grid(row=3,column=0, columnspan=1)
 
 
 
@@ -76,9 +90,10 @@ class MoreInfoPage(tk.Frame):
         self.customer.writetofile()
 
     def create_sessionplan(self):
-        sessioncreator_obj = createtrainingplan.TrainingPlanCreator(self.customer, self.controller)
-        sessioncreator_obj.createtrainingplan(circuits=self.number_of_circuits, supersets=self.number_of_supersets, sets=self.number_of_sets, planned_date = self.planned_date)
-        self.controller.frames["SessionPlanReviewPage"].injectdata(sessioncreator_obj.sessionplan.trainingplanjson, self.customer)
+        training_plan_obj = createtrainingplan.TrainingPlanCreator(self.customer, self.controller)
+        training_plan_obj.createtrainingplan(number_of_circuits=self.number_of_circuits, number_of_supersets=self.number_of_supersets, number_of_sets=self.number_of_sets, planned_date = self.planned_date)
+        print(training_plan_obj.trainingplanjson)
+        self.controller.frames["SessionPlanReviewPage"].injectdata(training_plan_obj.trainingplanjson, self.customer)
         self.controller.showwindow("SessionPlanReviewPage")
     
     
@@ -99,9 +114,52 @@ class MoreInfoPage(tk.Frame):
             self.number_of_sets = int(self.no_sets_SCALE.get())
         except Exception as e: pass
 
+    
+    def completeDoB_datechange(self,date):
+        self.customer.DoB = str(date)
+        self.DoB_label["text"] = "Date of Birth: " + str(date)
 
+    def textchangerequest(self,frame,label, getter, setter,prefix="",suffix=""):
+
+        def cancel(label, entry, row, column, padx, pady, sticky):
+            entry.destroy()
+            label.grid(row=row,column=column,sticky=sticky,padx=padx,pady=pady)
+                    
+        def apply(label, entry, row, column, padx, pady, sticky, prefix, suffix):
+            try:
+                setter(entry.get())
+            except Exception as e:
+                messagebox.showerror(message="Error occured:\n\n" + str(e))
+            label["text"] = f"{prefix}{entry.get()}{suffix}"
+            cancel(label, entry, row, column, padx, pady, sticky)
+            
+
+        row    = label.grid_info()['row']
+        column = label.grid_info()['column']
+        padx = label.grid_info()['padx']
+        pady = label.grid_info()['pady']
+        sticky= label.grid_info()['sticky']
+        label.grid_forget()
+        current_value = getter()
+        entry = ttk.Entry(frame)
+        entry.insert(tk.END, current_value)
+        entry.grid(row=row,column=column,sticky=sticky,padx=padx,pady=pady)
+
+        # bind return (save changes) and escape (cancel changes) keys
+        entry.bind("<Return>",lambda e:apply(label, entry, row, column, padx, pady, sticky,prefix,suffix))
+        entry.bind("<Escape>",lambda e:cancel(label, entry, row, column, padx, pady, sticky))
+    
+    def bindframe(self,frame,sequence,func):
+        """
+        Used to bind a click event to a function
+        """
+        frame.bind(sequence, func)
+        for child in frame.winfo_children():
+            child.bind(sequence, func)
+    
     def set_heading(self):
         self.controller.tkRoot.title("Training App > Edit Customer Data")
+    
     def __init__(self, controller):
         # initial setup
         tk.Frame.__init__(self)
@@ -116,9 +174,14 @@ class MoreInfoPage(tk.Frame):
         self.customerinfo_frame = ttk.LabelFrame(self.frame, text="Customer Information")
         self.DoB_label = ttk.Label(self.customerinfo_frame, text=f"Date of Birth: ")
         self.DoB_label.grid(row=0,column=0, padx=10, pady=15, sticky="w")
+        self.changeDoB_button = ttk.Button(self.customerinfo_frame, text="Change", command=lambda: selectdate.dateselect("Select Date", self.completeDoB_datechange))
+        self.changeDoB_button.grid(row=0,column=1)
         self.Email_Label = ttk.Label(self.customerinfo_frame, text=f"Email: ")
         self.Email_Label.grid(row=1,column=0, padx=10, pady=15, sticky="w")
         self.customerinfo_frame.grid(row=1,column=0,padx=20,pady=20)
+
+        self.AbilityLevel_Label = ttk.Label(self.customerinfo_frame)
+        self.AbilityLevel_Label.grid(row=2,column=0,padx=10,pady=15,sticky="w")
 
         self.checkbuttons={}
         self.goalscheckbutton_frames = ttk.LabelFrame(self.frame, text="Customer Goals")

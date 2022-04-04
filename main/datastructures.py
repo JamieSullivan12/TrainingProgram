@@ -63,7 +63,8 @@ class CustomerData():
             self.goals = row[indexes["Goals"]]
             self.email = row[indexes["Email"]]
             self.ID = row[indexes["ID"]]
-            self.ability_level = row[indexes["Ability Level"]]
+            if row[indexes["AbilityLevel"]] == "":self.ability_level=1
+            else:self.ability_level = float(row[indexes["AbilityLevel"]])
             self.session_plans_string = row[indexes["Session Plans"]]
 
             if self.session_plans_string != "":self.session_plans = json.loads(self.session_plans_string)
@@ -74,15 +75,39 @@ class CustomerData():
             else:self.categories=[]
 
         def writetofile(self):
+            #try:
             self.pandas_data.at[self.pandas_index,"Name"]=self.name
             self.pandas_data.at[self.pandas_index,"DoB"]=self.DoB
             self.pandas_data.at[self.pandas_index,"Goals"]=self.goals
             self.pandas_data.at[self.pandas_index,"Email"]=self.email
             self.pandas_data.at[self.pandas_index,"Categories"]=str(self.categories)
-            print(self.session_plans)
+
+            self.pandas_data.at[self.pandas_index,"AbilityLevel"]=str(self.ability_level)
+
             self.pandas_data.at[self.pandas_index,"Session Plans"]=json.dumps(self.session_plans)
             self.pandas_data.to_csv("tempdata1.csv", index=False)
-        
+            tk.messagebox.showinfo(message="Sucessfully made changes")
+            #except Exception as e:
+            #    tk.messagebox.showerror(message="Error(s) occured:\n\n" + str(e))
+
+
+        def setDoB(self,new):
+            self.DoB = new
+        def getDoB(self):
+            return self.DoB
+
+
+        def setEmail(self,new):
+            self.email = new
+        def getEmail(self):
+            return self.email
+
+
+        def setAbilityLevel(self,new):
+            self.ability_level = float(new)
+        def getAbilityLevel(self):
+            return self.ability_level
+
         def removesessionplan(self,session_plan):
             for plan in self.session_plans:
                 if plan["timestamp"] == session_plan["timestamp"]:

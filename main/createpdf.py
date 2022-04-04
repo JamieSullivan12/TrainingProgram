@@ -39,7 +39,17 @@ def createsessionplanPDF(jsonobj, customer_name,directory):
 
             for i,set in enumerate(superset["sets"]):
                 pdf.set_font("helvetica", "", 13)
-                pdf.cell(40,10,f"Set {str(i+1)}: {set['name']}", ln=True)
+                reps = set['reps']
+                time = set['time']
+                distance = set['distance']
+                suffix_text = ""
+                if str(reps) != "0":
+                    suffix_text = f"Reps: {reps}"
+                elif str(time) != "0":
+                    suffix_text = f"Time: {time} s"
+                elif str(distance) != "0":
+                    suffix_text = f"Distance: {distance} m"
+                pdf.cell(40,10,f"Set {str(i+1)}: {set['name']} - {suffix_text}", ln=True)
 
     output_directory = directory + "/SessionPlan_" + customer_name + "_PlannedDate_" + str(jsonobj['planned_date']).replace("/",".").replace(":",".") + ".pdf"
     pdf.output(output_directory)

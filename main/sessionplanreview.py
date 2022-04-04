@@ -151,7 +151,7 @@ class SessionPlanReviewPage(tk.Frame):
                     # insert a new exercise name for that set (whatever the user entered)
                     self.controller.controller.controller.trainingplanjson['circuits'][self.circuitindex]['supersets'][self.supersetindex]['sets'][self.setindex]['name'] = new_text
                     # change the set label to include the new defined value. This label will be shown in the setcancelrequest() function (which also removes the entry widget)
-                    self.set_label["text"] = f"Set {self.setindex}: {new_text}"
+                    self.set_label["text"] = f"Set {self.setindex+1}: {new_text}"
                     self.setcancelrequest()
                 
                 def infoapplychanges(self,event):
@@ -172,13 +172,10 @@ class SessionPlanReviewPage(tk.Frame):
         """
         Calls a function in the customer object which applies the new JSON to secondary memory
         """
-        try:
-            self.customer.removesessionplan(self.trainingplanjson)
-            self.customer.session_plans.append(self.trainingplanjson)
-            self.customer.writetofile()
-            messagebox.showinfo(title="Saved", message="Changes have been made")
-        except Exception as e:
-            messagebox.showerror(title="ERROR", message=f"An error occured in the saving process:\n\n{str(e)}")
+
+        self.customer.removesessionplan(self.trainingplanjson)
+        self.customer.session_plans.append(self.trainingplanjson)
+        self.customer.writetofile()
 
     def export_pdf(self):
         import createpdf
