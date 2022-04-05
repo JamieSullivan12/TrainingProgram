@@ -12,7 +12,6 @@ class ExerciseData():
             self.descriptor = row[indexes["Descriptor"]]
             self.type = row[indexes["Type"]]
             self.category = row[indexes["Category"]]
-            self.difficulty = row[indexes["Difficulty"]]
             self.categoryobj = ""
 
     class CategoriesData():
@@ -54,41 +53,50 @@ class ExerciseData():
 
 class CustomerData():
     
-    class Data():
-        def __init__(self,row,indexes,pandas_data, pandas_index):
+    class Trainee():
+        def __init__(self,pandas_data, pandas_index):
+            """
+            Initialise a customer object.
+            - row = a row from the pandas datastructure (row for the customer being created)
+            - indexes = dictionary mapping indexes in [row] to fields (Name, DoB, Goals etc.)
+            - pandas_data = entire pandas dataset (required when saving changes)
+            - 
+            """
             self.pandas_index=pandas_index
             self.pandas_data=pandas_data
-            self.name = row[indexes["Name"]]
-            self.DoB = row[indexes["DoB"]]
-            self.goals = row[indexes["Goals"]]
-            self.email = row[indexes["Email"]]
-            self.ID = row[indexes["ID"]]
-            if row[indexes["AbilityLevel"]] == "":self.ability_level=1
-            else:self.ability_level = float(row[indexes["AbilityLevel"]])
-            self.session_plans_string = row[indexes["Session Plans"]]
 
+            self.name = self.pandas_data.at[self.pandas_index, "Name"]
+            self.DoB = self.pandas_data.at[self.pandas_index, "DoB"]
+            self.goals = self.pandas_data.at[self.pandas_index, "Goals"]
+            self.email = self.pandas_data.at[self.pandas_index, "Email"]
+            self.ID = self.pandas_data.at[self.pandas_index, "ID"]
+            # ability level defaults to 1 if empty
+            self.ability_level = self.pandas_data.at[self.pandas_index, "AbilityLevel"]
+            if str(self.ability_level) == "": self.ability_level = 1
+            # session_plans defualts to an empty list ([]) if empty
+            # if not empty, the session_plans string will be converted into a JSON
+            self.session_plans_string = self.pandas_data.at[self.pandas_index, "Session Plans"]
             if self.session_plans_string != "":self.session_plans = json.loads(self.session_plans_string)
             else:self.session_plans=[]
-
-            self.categories_string = row[indexes["Categories"]]
-            if self.categories_string != "":self.categories = json.loads(row[indexes["Categories"]])
+            # categories defaults to an empty list ([]) if empty
+            # if not empty, the categories will be converted to a LIST using json.loads
+            self.categories_string = self.pandas_data.at[self.pandas_index, "Categories"]
+            if self.categories_string != "":self.categories = json.loads(self.categories_string)
             else:self.categories=[]
 
         def writetofile(self):
-            #try:
-            self.pandas_data.at[self.pandas_index,"Name"]=self.name
-            self.pandas_data.at[self.pandas_index,"DoB"]=self.DoB
-            self.pandas_data.at[self.pandas_index,"Goals"]=self.goals
-            self.pandas_data.at[self.pandas_index,"Email"]=self.email
-            self.pandas_data.at[self.pandas_index,"Categories"]=str(self.categories)
-
-            self.pandas_data.at[self.pandas_index,"AbilityLevel"]=str(self.ability_level)
-
-            self.pandas_data.at[self.pandas_index,"Session Plans"]=json.dumps(self.session_plans)
-            self.pandas_data.to_csv("tempdata1.csv", index=False)
-            tk.messagebox.showinfo(message="Sucessfully made changes")
-            #except Exception as e:
-            #    tk.messagebox.showerror(message="Error(s) occured:\n\n" + str(e))
+            try:
+                self.pandas_data.at[self.pandas_index,"Name"]=self.name
+                self.pandas_data.at[self.pandas_index,"DoB"]=self.DoB
+                self.pandas_data.at[self.pandas_index,"Goals"]=self.goals
+                self.pandas_data.at[self.pandas_index,"Email"]=self.email
+                self.pandas_data.at[self.pandas_index,"Categories"]=str(self.categories)
+                self.pandas_data.at[self.pandas_index,"AbilityLevel"]=str(self.ability_level)
+                self.pandas_data.at[self.pandas_index,"Session Plans"]=json.dumps(self.session_plans)
+                self.pandas_data.to_csv("tempdata1.csv", index=False)
+                tk.messagebox.showinfo(message="Sucessfully made changes")
+            except Exception as e:
+                tk.messagebox.showerror(message="Error(s) occured:\n\n" + str(e))
 
 
         def setDoB(self,new):
@@ -96,12 +104,10 @@ class CustomerData():
         def getDoB(self):
             return self.DoB
 
-
         def setEmail(self,new):
             self.email = new
         def getEmail(self):
             return self.email
-
 
         def setAbilityLevel(self,new):
             self.ability_level = float(new)
@@ -114,20 +120,20 @@ class CustomerData():
                     self.session_plans.remove(plan)
 
     def __init__(self):
-        self.customer_file = pd.read_csv("tempdata1.csv")
-        self.customer_file = self.customer_file.fillna('') #replace empty fields (which would normally show NaN) with ""
-        self.customer_file['DoB'] = pd.to_datetime(self.customer_file['DoB'], dayfirst=True, errors='coerce')
+        self.cusomter_pd = pd.read_csv("tempdata1.csv")
+        self.cusomter_pd = self.cusomter_pd.fillna('') #replace empty fields (which would normally show NaN) with ""
+        # format the Date of Birth as a date
+        self.cusomter_pd['DoB'] = pd.to_datetime(self.cusomter_pd['DoB'], dayfirst=True, errors='coerce')
 
-        indexes={}
-        for l,header in enumerate(list(self.customer_file)): #list(customer_df) returns all headings
-            indexes[header]=l
+        self.traineedata = {}
 
-        self.customerdata = {}
-        # loop through each row of datastructure
-        for i,row in self.customer_file.iterrows():
-            customer_obj = self.Data(row,indexes,self.customer_file, i)
-            self.customerdata[customer_obj.ID]=customer_obj
-
+        i=0
+        # loop through each row/trainee in the datastructure
+        while i < len(self.cusomter_pd):
+            # create an object for each customer
+            trainee_obj = self.Trainee(self.cusomter_pd, i)
+            self.traineedata[trainee_obj.ID]=trainee_obj
+            i = i + 1
 
 
 

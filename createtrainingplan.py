@@ -11,11 +11,13 @@ class TrainingPlanCreator():
         return base * round(x/base)
 
     def Sets(self, number_of_sets):
+        # if there are not enough exercises left, an error will be thrown.
+        # NOTE: this will be the case if there are not enough exercises in the database with the categories selected by the
+        # trainer
         if len(self.validexerciseIDs) == 0:
             self.error = True
             return
-    
-        
+
         # create sets
         for i in range(number_of_sets):
             random_no = randint(0,len(self.validexerciseIDs)-1)
@@ -53,7 +55,6 @@ class TrainingPlanCreator():
 
         
     def Circuits(self, number_of_circuits, number_of_supersets, number_of_sets):
-
         for i in range(number_of_circuits):
             circuitname = f"Circuit {i+1}"
             self.trainingplanjson["circuits"].append({"circuit_name":circuitname})
@@ -82,7 +83,6 @@ class TrainingPlanCreator():
         self.error=False
         self.sets = []    
         
-
         # initialising the JSON with circuits, warmup, cooldown, customerid, timestamp (current time), and planned date (the date that the trainer
         # is planning on completing the session)
         self.trainingplanjson = {"circuits":[],"warmup":[],"cooldown":[],"customerid":"", "timestamp":datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S"), "planned_date": str(planned_date)}

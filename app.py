@@ -42,16 +42,22 @@ class GUI(ttk.Frame):
         self.container.grid_rowconfigure(0,weight=1)
         self.container.grid_columnconfigure(0,weight=1)
         self.frame_obj = self.CreateScrollableFrame(self)
+        # function that tracks ALL clicks on the Tkinter window
         self.tracker.link_scrollable_frame(self.frame_obj)
 
         # initialising customer data
         self.customerdata_obj = datastructures.CustomerData()
-        self.customerdata_dict = self.customerdata_obj.customerdata
+        self.customerdata_dict = self.customerdata_obj.traineedata
         # initialising exercises data
         self.data_obj = datastructures.ExerciseData()
         self.exercisedata_dict = self.data_obj.exercisedata
         # initialising category data
         self.categorydata_dict = self.data_obj.categoriesdata
+
+        # create all pages that the user can navigate to
+        self.setupwindows()
+        # only show the home page (initial page the user is greeted with)
+        self.showwindow("HomePage")
 
         # configure the navigation menu/bar
         self.menubar = tk.Menu(self.parent)
@@ -64,10 +70,7 @@ class GUI(ttk.Frame):
         self.menubar.add_cascade(label="Navigate", menu=self.navigate)
         self.parent.config(menu=self.menubar)
         
-        # create all pages that the user can navigate to
-        self.setupwindows()
-        # only show the home page (initial page the user is greeted with)
-        self.showwindow("HomePage")
+
 
         self.container.pack(side='top', fill='both', expand=True)
     '''
