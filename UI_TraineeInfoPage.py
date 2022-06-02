@@ -3,9 +3,9 @@ from email import message
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-import createtrainingplan
-import selectdate
-class MoreInfoPage(tk.Frame):
+import Process_CreateTrainingPlan
+import reuseable_datepopup
+class MoreInfoPage(ttk.Frame):
     
     class GoalsInput():
         def __init__(self,parent,name,row,column):
@@ -41,16 +41,16 @@ class MoreInfoPage(tk.Frame):
             self.session_frame.grid_forget()
             self.session_frame.destroy()
         except Exception as e:pass
-        self.session_frame = ttk.LabelFrame(self.frame,text="Session Plans")
+        self.session_frame = ttk.LabelFrame(self,text="Session Plans")
         self.session_frame.grid(row=3,column=0,columnspan=2)
         
-        sessionplan_list=[]
-        for session_plan in self.customer.session_plans:
-            sessionplan_list.append(session_plan)
+        trainingplan_list=[]
+        for training_plan in self.customer.training_plans:
+            trainingplan_list.append(training_plan)
         
         sessionplan_rowobjects = []
-        for row,session_plan in enumerate(sessionplan_list):
-            sessionplan_row= self.SessionPlanRow(self,session_plan,row)
+        for row,training_plan in enumerate(trainingplan_list):
+            sessionplan_row= self.SessionPlanRow(self,training_plan,row)
             sessionplan_rowobjects.append(sessionplan_row)
 
     def injectdata(self,customer):
@@ -61,8 +61,8 @@ class MoreInfoPage(tk.Frame):
         self.AbilityLevel_Label["text"]=f"Ability Level: {self.customer.ability_level}"
         for checkbutton_id in self.checkbuttons:
             self.checkbuttons[checkbutton_id][1].set(0)
-        for category in self.customer.categories:
-            self.checkbuttons[category][1].set(1)
+        for goal in self.customer.goals:
+            self.checkbuttons[goal][1].set(1)
         
         self.create_list_of_sessions()
         self.setup_customer_info_frame()
@@ -82,15 +82,15 @@ class MoreInfoPage(tk.Frame):
 
 
     def update_goals(self):
-        category_list = []
-        for category_id in self.checkbuttons:
-            if self.checkbuttons[category_id][1].get()==1:
-                category_list.append(category_id)
-        self.customer.categories = category_list
+        goal_list = []
+        for goal_id in self.checkbuttons:
+            if self.checkbuttons[goal_id][1].get()==1:
+                goal_list.append(goal_id)
+        self.customer.goals = goal_list
         self.customer.writetofile()
 
     def create_sessionplan(self):
-        training_plan_obj = createtrainingplan.TrainingPlanCreator(self.customer, self.controller)
+        training_plan_obj = Process_CreateTrainingPlan.TrainingPlanCreator(self.customer, self.controller)
         training_plan_obj.createtrainingplan(number_of_circuits=self.number_of_circuits, number_of_supersets=self.number_of_supersets, number_of_sets=self.number_of_sets, planned_date = self.planned_date)
         print(training_plan_obj.trainingplanjson)
         self.controller.frames["SessionPlanReviewPage"].injectdata(training_plan_obj.trainingplanjson, self.customer)
@@ -161,20 +161,19 @@ class MoreInfoPage(tk.Frame):
         self.controller.tkRoot.title("Training App > Edit Customer Data")
     
     def __init__(self, controller):
-        # initial setup
-        tk.Frame.__init__(self)
+        ttk.Frame.__init__(self, controller.frame_obj.scrollable_frame)
+
         self.controller = controller
 
-        self.frame = ttk.Frame(self.controller.frame_obj.scrollable_frame)
-        self.frame.grid_columnconfigure(0, weight=1)
-        self.frame.grid_rowconfigure(0, weight=1)
-        self.title = ttk.Label(self.frame, text=f"Customer: ")
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.title = ttk.Label(self, text=f"Customer: ")
         self.title.grid(row=0,column=0, padx=10, pady=(10,0), sticky="w")
 
-        self.customerinfo_frame = ttk.LabelFrame(self.frame, text="Customer Information")
+        self.customerinfo_frame = ttk.LabelFrame(self, text="Customer Information")
         self.DoB_label = ttk.Label(self.customerinfo_frame, text=f"Date of Birth: ")
         self.DoB_label.grid(row=0,column=0, padx=10, pady=15, sticky="w")
-        self.changeDoB_button = ttk.Button(self.customerinfo_frame, text="Change", command=lambda: selectdate.dateselect("Select Date", self.completeDoB_datechange))
+        self.changeDoB_button = ttk.Button(self.customerinfo_frame, text="Change", command=lambda: reuseable_datepopup.dateselect("Select Date", self.completeDoB_datechange))
         self.changeDoB_button.grid(row=0,column=1)
         self.Email_Label = ttk.Label(self.customerinfo_frame, text=f"Email: ")
         self.Email_Label.grid(row=1,column=0, padx=10, pady=15, sticky="w")
@@ -184,7 +183,7 @@ class MoreInfoPage(tk.Frame):
         self.AbilityLevel_Label.grid(row=2,column=0,padx=10,pady=15,sticky="w")
 
         self.checkbuttons={}
-        self.goalscheckbutton_frames = ttk.LabelFrame(self.frame, text="Customer Goals")
+        self.goalscheckbutton_frames = ttk.LabelFrame(self, text="Customer Goals")
         for category in self.controller.categorydata_dict:
             CheckVar = tk.IntVar()
 
@@ -199,7 +198,7 @@ class MoreInfoPage(tk.Frame):
         
         self.goalscheckbutton_frames.grid(row=1,column=1)
 
-        self.create_training_plan_frame = ttk.LabelFrame(self.frame, text="Create Training Plan")
+        self.create_training_plan_frame = ttk.LabelFrame(self, text="Create Training Plan")
 
         ### CREATING THE CREATE TRAINING PLAN WINDOW - has three scrollers:
         ### - Circuits: control the amount of circuits which will exist in the generated session
@@ -247,7 +246,7 @@ class MoreInfoPage(tk.Frame):
             self.planned_date = date
             self.planned_date_label["text"] = "Selected Date: " + str(self.planned_date)
 
-        self.choose_planned_date_button = ttk.Button(self.create_training_plan_frame, text="Plan a Date", command=lambda:selectdate.dateselect("Select a date", dateselected))
+        self.choose_planned_date_button = ttk.Button(self.create_training_plan_frame, text="Plan a Date", command=lambda:reuseable_datepopup.dateselect("Select a date", dateselected))
         self.planned_date_label = ttk.Label(self.create_training_plan_frame, text="No date selected")
 
         self.choose_planned_date_button.grid(row=3,column=0,padx=15,pady=15,sticky="w")

@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
-import homepage, customerpage, addcustomerpage, moreinfopage, sessionplanreview
+import UI_HomePage, UI_TraineePage, UI_AddCustomerpage, UI_TraineeInfoPage, UI_TrainingPlanViewerPage
 import pandas as pd
-import datastructures
+import Process_DataStructures
 
 class Tracker:
     """ Toplevel windows resize event tracker. """
@@ -46,10 +46,10 @@ class GUI(ttk.Frame):
         self.tracker.link_scrollable_frame(self.frame_obj)
 
         # initialising customer data
-        self.customerdata_obj = datastructures.CustomerData()
+        self.customerdata_obj = Process_DataStructures.CustomerData()
         self.customerdata_dict = self.customerdata_obj.traineedata
         # initialising exercises data
-        self.data_obj = datastructures.ExerciseData()
+        self.data_obj = Process_DataStructures.Data()
         self.exercisedata_dict = self.data_obj.exercisedata
         # initialising category data
         self.categorydata_dict = self.data_obj.categoriesdata
@@ -87,25 +87,31 @@ class GUI(ttk.Frame):
 
     
     '''
-    Initialises all other GUI classes, creating all the required windows and stacking them inside the container
+    Initialise all GUI classes
     '''
     def setupwindows(self):
         # calling on other page classes means commands will be pre-loaded== that are not available yet (such as page loading)
         # ignore_setup will make sure these effects are not run
         self.ignore_setup=True 
-        #
+        
+        # store all created frames (top level containers) in a dictionary.
+        # used when the user switches pages (requested frame brought to front)
         self.frames={}
-        pages = [homepage.HomePage,customerpage.CustomerPage,addcustomerpage.AddCustomerPage, moreinfopage.MoreInfoPage,sessionplanreview.SessionPlanReviewPage]
 
-
-        # setup all page classes
+        # loop through all imported GUI objects (from other files)
+        pages = [UI_HomePage.HomePage,UI_TraineePage.CustomerPage,UI_AddCustomerpage.AddCustomerPage, UI_TraineeInfoPage.MoreInfoPage,UI_TrainingPlanViewerPage.SessionPlanReviewPage]
         for page in pages:
+            # if page already has been initalised, remove it
             if page.__name__ in self.frames:
                 self.frames[page.__name__].grid_forget()
             page_name = page.__name__
-            frame = page(self) # initialise class
-            self.frames[page_name] = frame # store list of classes (UI pages) in a list
-        
+
+            # initalise the GUI object
+            # self is passed as a "parent class"
+            frame = page(self)
+
+            # keep track of the initialised pages in a dict {page name: frame}
+            self.frames[page_name] = frame
            
         self.ignore_setup=False
 
@@ -116,13 +122,14 @@ class GUI(ttk.Frame):
     def showwindow(self, frame_name):
         if not self.ignore_setup:
             
+            
             for frame in self.frames:
-                self.frames[frame].frame.grid_forget()
+                self.frames[frame].grid_forget()
 
             self.current_frame = frame_name
             frame = self.frames[frame_name]
             self.current_frame_object = frame
-            frame.frame.grid(row=0,column=0)
+            frame.grid(row=0,column=0)
             self.frame_obj.update()
 
 
@@ -205,20 +212,23 @@ class GUI(ttk.Frame):
             else:
                 self.vscrollable=True
 
-
+# only run the following code if it has been initialised by the user
 if __name__ == '__main__':
+    # initialise tkinter object
     root = tk.Tk()
     root.withdraw()
     parent = tk.Toplevel(master=root)
     root.title("Training App")
-
-    parent.tk.call("source", "sun-valley.tcl")
-    parent.tk.call("set_theme", "light")
-    
     tracker = Tracker(parent)
     tracker.bind_config()
+    # setup UI styling
+    parent.tk.call("source", "sun-valley.tcl")
+    parent.tk.call("set_theme", "light")
 
+    # initliase UI object (note GUI is a class above)
     gui = GUI(parent,tracker)
 
-
+    # continually loop to listen for events
     parent.mainloop()
+
+    

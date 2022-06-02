@@ -2,16 +2,16 @@
 from encodings import search_function
 import tkinter as tk
 from tkinter import ttk
-import app
+import main
 import tkinter.messagebox
 import pandas as pd
 from datetime import datetime,date
-from datastructures import Customers
+
 
 '''
 Contains the code for the customer page. On this page, the user can access all customer details and change them
 '''
-class CustomerPage(tk.Frame):
+class CustomerPage(ttk.Frame):
 
     """
     Object containing only information for each customer row seen in the customers user interface page
@@ -33,7 +33,7 @@ class CustomerPage(tk.Frame):
             self.controller=controller
 
             # creating child frame in which individual customer rows will appear
-            self.customer_frame = ttk.Frame(self.controller.frame)
+            self.customer_frame = ttk.Frame(self.controller)
             self.customer_frame.columnconfigure(0, weight=3)
             self.customer_frame.columnconfigure(1, weight=1)
             # horizontal line separating customer rows
@@ -119,17 +119,16 @@ class CustomerPage(tk.Frame):
         self.controller.tkRoot.title("Training App > Customers")
 
     def __init__(self, controller):
-        tk.Frame.__init__(self)
-        # initial setup
+        ttk.Frame.__init__(self, controller.frame_obj.scrollable_frame)
         self.controller = controller
-        self.frame = ttk.Frame(self.controller.frame_obj.scrollable_frame)
-        title = ttk.Label(self.frame, text="Customers")
+
+        title = ttk.Label(self, text="Customers")
         title.grid(row=0,column=0, padx=(40,10), pady=(10,0), sticky="w")
 
 
-        self.search_texbox = ttk.Entry(self.frame, width=50)
+        self.search_texbox = ttk.Entry(self, width=50)
         self.search_texbox.grid(row=1,column=0,padx=(40,0))
-        self.search_button = ttk.Button(self.frame,text="Search", width=30,command=lambda:self.searchfunction())
+        self.search_button = ttk.Button(self,text="Search", width=30,command=lambda:self.searchfunction())
         self.search_button.grid(row=1,column=1, padx=(20,10),pady=10)
 
         # used to store all customer row objects

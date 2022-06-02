@@ -2,7 +2,7 @@ from email import message
 from tkinter import ttk
 import tkinter as tk
 from tkinter import messagebox
-class SessionPlanReviewPage(tk.Frame):
+class SessionPlanReviewPage(ttk.Frame):
     def set_heading(self):
         self.controller.tkRoot.title("Training App > Edit Customer Data")
     
@@ -174,11 +174,11 @@ class SessionPlanReviewPage(tk.Frame):
         """
 
         self.customer.removesessionplan(self.trainingplanjson)
-        self.customer.session_plans.append(self.trainingplanjson)
+        self.customer.training_plans.append(self.trainingplanjson)
         self.customer.writetofile()
 
     def export_pdf(self):
-        import createpdf
+        import Process_GeneratePDF
         from tkinter.filedialog import askdirectory
 
         directory = ""
@@ -186,7 +186,7 @@ class SessionPlanReviewPage(tk.Frame):
         print(directory)
         if directory != "":
             try:
-                createpdf.createsessionplanPDF(self.trainingplanjson, self.customer.name, directory)
+                Process_GeneratePDF.createsessionplanPDF(self.trainingplanjson, self.customer.name, directory)
             except Exception as e:
                 messagebox.showerror(title="ERROR", message=f"An error occured when exporting to PDF:\n\n{str(e)}")
     
@@ -195,25 +195,24 @@ class SessionPlanReviewPage(tk.Frame):
         self.savedata()
         self.injectdata(self.trainingplanjson, self.customer)
     def changeplanneddate(self):
-        import selectdate
+        import reuseable_datepopup
 
-        selectdate.dateselect("Select Date", self.completedatechange)
+        reuseable_datepopup.dateselect("Select Date", self.completedatechange)
 
     def __init__(self, controller):
-        # initial setup
-        tk.Frame.__init__(self)
-        self.controller = controller
-        self.frame = ttk.Frame(self.controller.frame_obj.scrollable_frame)
+        ttk.Frame.__init__(self, controller.frame_obj.scrollable_frame)
 
-        self.info_label = ttk.Label(self.frame)
+        self.controller = controller
+
+        self.info_label = ttk.Label(self)
         self.info_label.grid(row=0,column=0,columnspan=100, sticky="w", padx=15, pady=15)
-        self.save_button = ttk.Button(self.frame,text="Save",command=self.savedata)
+        self.save_button = ttk.Button(self,text="Save",command=self.savedata)
         self.save_button.grid(row=1,column=0,ipadx=15,columnspan=100, padx=15, pady=5, sticky="w")
 
-        self.pdf_export_button = ttk.Button(self.frame,text="Export PDF",command=self.export_pdf)
+        self.pdf_export_button = ttk.Button(self,text="Export PDF",command=self.export_pdf)
         self.pdf_export_button.grid(row=2,column=0,columnspan=100,ipadx=15, padx=15, pady=5, sticky="w")
 
-        self.change_planned_date_button = ttk.Button(self.frame,text="Change Planned Date",command=self.changeplanneddate)
+        self.change_planned_date_button = ttk.Button(self,text="Change Planned Date",command=self.changeplanneddate)
         self.change_planned_date_button.grid(row=3,column=0,columnspan=100,ipadx=15, padx=15, pady=5, sticky="w")
 
 
@@ -232,7 +231,7 @@ class SessionPlanReviewPage(tk.Frame):
             self.master_frame.grid_forget()
             self.master_frame.destroy()
         except Exception as e: pass        
-        self.master_frame = ttk.Frame(self.frame)
+        self.master_frame = ttk.Frame(self)
         self.master_frame.grid(row=5,column=0)
 
         self.info_label["text"] = f"Session Plan for {self.customer.name}\nLast modified: {self.trainingplanjson['timestamp']}\nPlanned date: {self.trainingplanjson['planned_date']}"
