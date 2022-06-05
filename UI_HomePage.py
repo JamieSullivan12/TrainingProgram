@@ -23,3 +23,6 @@ class HomePage(ttk.Frame):
         self.add_customer_button = ttk.Button(self,text="Add Customer",width=30, command=lambda:self.controller.showwindow("AddCustomerPage"))
         self.add_customer_button.grid(row=2,column=0, padx=(20,10),pady=10)
 
+        self.modify_exercises_button = ttk.Button(self,text="Modify Exercises Dataset",width=30, command=lambda:self.controller.showwindow("ModifyExercisesPage"))
+        self.modify_exercises_button.grid(row=3,column=0, padx=(20,10),pady=10)
+

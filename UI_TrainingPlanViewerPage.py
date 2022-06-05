@@ -3,41 +3,37 @@ from tkinter import ttk
 import tkinter as tk
 from tkinter import messagebox
 class SessionPlanReviewPage(ttk.Frame):
-    def set_heading(self):
-        self.controller.tkRoot.title("Training App > Edit Customer Data")
-    
 
     class ListCircuit():
         """
         Will list all the circuits across the page
         """
-        def __init__(self,controller,index,row,column):
-            self.controller=controller
+        def __init__(self, page_frame, circuit_obj,column):
 
-            self.frame = ttk.LabelFrame(self.controller.master_frame,text=self.controller.trainingplanjson["circuits"][index]["circuit_name"])
-            self.frame.grid(row=row,column=column,padx=15,pady=15)
+            self.circuit_frame = ttk.LabelFrame(page_frame,text=f"Circuit {column+1}")
+            self.circuit_frame.grid(row=0,column=column,padx=15,pady=15)
 
-            row=0
-            for supersetindex,self.superset in enumerate(self.controller.trainingplanjson["circuits"][index]["supersets"]):
-                self.ListSupersets(self,supersetindex,index,row)
-                row += 1
+
+            for superset_index, superset_obj in enumerate(circuit_obj.supersets):
+                self.ListSupersets(self.circuit_frame,superset_obj, superset_index)
+
         
+
         class ListSupersets():
             """
             Will list all of the supersets inside of a circuit frame
             """
-            def __init__(self,controller,supersetindex,circuitindex,row):
-                self.controller=controller
-
-                self.frame=ttk.LabelFrame(self.controller.frame,text=f"Superset {supersetindex+1}")
-                self.frame.grid(row=row,column=0,padx=10,pady=(15,0),sticky="ew")
-
-
-                for setindex,set in enumerate(self.controller.controller.trainingplanjson["circuits"][circuitindex]["supersets"][supersetindex]['sets']):
-                    self.ListSets(self,supersetindex,setindex,circuitindex)
+            def __init__(self,circuit_frame,superset_obj,superset_index):
+                
+                self.superset_frame=ttk.LabelFrame(circuit_frame,text=f"Superset {superset_index+1}")
+                self.superset_frame.grid(row=superset_index,column=0,padx=10,pady=(15,0),sticky="ew")
 
 
-            class ListSets():
+                for set_index,set_obj in enumerate(superset_obj.sets):
+                    self.ListExercises(self.superset_frame,set_obj,set_index)
+
+
+            class ListExercises():
                 """
                 Controls the creation of a single set in the session plan review page. Abstracts functionality:
                 - Showing the set as well as reps/time/distance
@@ -53,44 +49,48 @@ class SessionPlanReviewPage(ttk.Frame):
                         child.bind(sequence, func)
                 
 
-                def __init__(self,controller,supersetindex,setindex, circuitindex):
-                    # Each set shows up like this:
-                    # Set #: set_name {set}
-                    # Reps/Time/Distance: # {info}
-                    
-                    self.controller=controller
-
+                def __init__(self, superset_frame, set_obj, set_index):
+                    self.set_index = set_index
                     # container frame for an individual set
-                    self.set_frame = ttk.Frame(self.controller.frame)
+                    self.set_frame = ttk.Frame(superset_frame)
+                    self.set_obj=set_obj
+                    self.setname = ""
+                    self.setlength = ""
+                    self.typeofexercise=""
 
-                    # provide pathways to the set in the JSON object (used for reading and modification)
-                    self.supersetindex=supersetindex
-                    self.setindex=setindex
-                    self.circuitindex=circuitindex
+                    if self.set_obj.overridename != "": 
+                        self.setname=self.set_obj.overridename
+                    else:
+                        self.setname=self.set_obj.exercise_obj.descriptor
+                    
+                    if self.set_obj.overridelength != str(0): 
+                        self.setlength=self.set_obj.overridelength
+                        self.typeofexercise="custom"
+                    else:
+                        # creating the info display (e.g. Reps: 10 OR Time: 30)
+                        if str(self.set_obj.reps) != str(0):
+                            self.typeofexercise="reps"
+                            self.setlength = str(self.set_obj.reps)
+                        elif str(self.set_obj.time) != str(0):
+                            self.typeofexercise="time"
+                            self.setlength = str(self.set_obj.time)
+                        elif str(self.set_obj.distance) != str(0):
+                            self.typeofexercise="distance"
+                            self.setlength = str(self.set_obj.distance)
 
                     # creating the set label (e.g. Set 1: Barbell Squats)
-                    self.set_label = ttk.Label(self.set_frame,text=f"Set {self.setindex+1}: {self.controller.controller.controller.trainingplanjson['circuits'][self.circuitindex]['supersets'][self.supersetindex]['sets'][self.setindex]['name']}")
-                    
-                    # creating the info display (e.g. Reps: 10 OR Time: 30)
-                    self.type_of_exercise=""
-                    if self.controller.controller.controller.trainingplanjson['circuits'][circuitindex]['supersets'][supersetindex]['sets'][setindex]['reps'] != 0:
-                        self.type_of_exercise="reps"
-                    elif self.controller.controller.controller.trainingplanjson['circuits'][circuitindex]['supersets'][supersetindex]['sets'][setindex]['time'] != 0:
-                        self.type_of_exercise="time"
-                    elif self.controller.controller.controller.trainingplanjson['circuits'][circuitindex]['supersets'][supersetindex]['sets'][setindex]['distance'] != 0:
-                        self.type_of_exercise="distance"
-                    else:
-                        self.type_of_exercise="reps"
+                    self.set_label = ttk.Label(self.set_frame,text=f"Set {set_index+1}: {self.setname}")
 
-                    self.info_label = ttk.Label(self.set_frame,text=f"{self.type_of_exercise.title()}: {self.controller.controller.controller.trainingplanjson['circuits'][circuitindex]['supersets'][supersetindex]['sets'][setindex][self.type_of_exercise]}")
+                    self.info_label = ttk.Label(self.set_frame,text=f"{self.typeofexercise.title()}: {self.setlength}")
                     
             
                     self.set_label.grid(row=0,column=0,padx=10,pady=(10,3),sticky="w")
                     self.info_label.grid(row=1, column=0,padx=10,pady=(0,6),sticky="w")
-                    self.set_frame.grid(row=setindex+1, column=0,sticky="w")
+                    self.set_frame.grid(row=set_index+1, column=0,sticky="w")
 
                     self.bindframe(self.set_label,"<Double-Button-1>",self.setchangerequest)
                     self.bindframe(self.info_label,"<Double-Button-1>",self.infochangerequest)
+
 
 
                 def setchangerequest(self,event):
@@ -99,8 +99,9 @@ class SessionPlanReviewPage(ttk.Frame):
                     """
                     self.set_label.grid_forget()
 
+
                     self.set_entry = ttk.Entry(self.set_frame)
-                    self.set_entry.insert(tk.END, self.controller.controller.controller.trainingplanjson['circuits'][self.circuitindex]['supersets'][self.supersetindex]['sets'][self.setindex]['name'])
+                    self.set_entry.insert(tk.END, self.setname)
                     self.set_entry.grid(row=0,column=0,sticky="w",padx=10,pady=(10,3))
 
                     # bind return (save changes) and escape (cancel changes) keys
@@ -113,13 +114,12 @@ class SessionPlanReviewPage(ttk.Frame):
                     """
                     self.info_label.grid_forget()
                     self.info_entry = ttk.Entry(self.set_frame)
-                    self.info_entry.insert(tk.END, self.controller.controller.controller.trainingplanjson['circuits'][self.circuitindex]['supersets'][self.supersetindex]['sets'][self.setindex][self.type_of_exercise])
+                    self.info_entry.insert(tk.END, self.setlength)
                     self.info_entry.grid(row=1,column=0,sticky="w",padx=10,pady=(0,6))
 
                     # bind return (save changes) and escape (cancel changes) keys
                     self.info_entry.bind("<Return>",self.infoapplychanges)
                     self.info_entry.bind("<Escape>",self.infocancelrequest)
-
 
                 def setcancelrequest(self,*args):
                     """
@@ -130,7 +130,6 @@ class SessionPlanReviewPage(ttk.Frame):
                     self.set_entry.destroy()
                     self.set_label.grid(row=0,column=0,sticky="w",padx=10,pady=(10,3))
                     
-
                 def infocancelrequest(self,*args):
                     """
                     Will replace existing entry box for the set information text entry with the original text. Note this function can be called when:
@@ -146,12 +145,11 @@ class SessionPlanReviewPage(ttk.Frame):
                     """
                     # entry widget string value (what the user has entered)
                     new_text=self.set_entry.get()
-                    # insert a new exercise_id for that set (it will be 0 as it is a custom ID)
-                    self.controller.controller.controller.trainingplanjson['circuits'][self.circuitindex]['supersets'][self.supersetindex]['sets'][self.setindex]['exercise_id'] = 0
+
                     # insert a new exercise name for that set (whatever the user entered)
-                    self.controller.controller.controller.trainingplanjson['circuits'][self.circuitindex]['supersets'][self.supersetindex]['sets'][self.setindex]['name'] = new_text
+                    self.set_obj.overridename = new_text
                     # change the set label to include the new defined value. This label will be shown in the setcancelrequest() function (which also removes the entry widget)
-                    self.set_label["text"] = f"Set {self.setindex+1}: {new_text}"
+                    self.set_label["text"] = f"Set {self.set_index+1}: {new_text}"
                     self.setcancelrequest()
                 
                 def infoapplychanges(self,event):
@@ -161,9 +159,9 @@ class SessionPlanReviewPage(ttk.Frame):
                     # entry widget string value (what the user has entered)
                     new_text=self.info_entry.get()
                     # insert a new value for the exercise reps/distance/time into the JSON
-                    self.controller.controller.controller.trainingplanjson['circuits'][self.circuitindex]['supersets'][self.supersetindex]['sets'][self.setindex][self.type_of_exercise]=new_text
+                    self.set_obj.overridelength=new_text
                     # change the set label to include the new defined value. This label will be shown in the infocancelrequest() function (which also removes the entry widget)
-                    self.info_label["text"] = f"{self.type_of_exercise.title()}: {new_text}"
+                    self.info_label["text"] = f"{new_text}"
                     self.infocancelrequest()
 
 
@@ -173,8 +171,7 @@ class SessionPlanReviewPage(ttk.Frame):
         Calls a function in the customer object which applies the new JSON to secondary memory
         """
 
-        self.customer.removesessionplan(self.trainingplanjson)
-        self.customer.training_plans.append(self.trainingplanjson)
+
         self.customer.writetofile()
 
     def export_pdf(self):
@@ -186,14 +183,16 @@ class SessionPlanReviewPage(ttk.Frame):
         print(directory)
         if directory != "":
             try:
-                Process_GeneratePDF.createsessionplanPDF(self.trainingplanjson, self.customer.name, directory)
+                Process_GeneratePDF.createsessionplanPDF(self.trainingplan, self.customer.name, directory)
             except Exception as e:
                 messagebox.showerror(title="ERROR", message=f"An error occured when exporting to PDF:\n\n{str(e)}")
     
     def completedatechange(self,date):
-        self.trainingplanjson["planned_date"] = str(date)
+
+        self.trainingplan.planned_date = str(date)
         self.savedata()
-        self.injectdata(self.trainingplanjson, self.customer)
+        self.injectdata(self.trainingplan, self.customer)
+    
     def changeplanneddate(self):
         import reuseable_datepopup
 
@@ -216,7 +215,7 @@ class SessionPlanReviewPage(ttk.Frame):
         self.change_planned_date_button.grid(row=3,column=0,columnspan=100,ipadx=15, padx=15, pady=5, sticky="w")
 
 
-    def injectdata(self,trainingplanjson, customer):
+    def injectdata(self,trainingplan, customer):
         """
         Inject specific session plan data in to this page.
         Params:
@@ -225,7 +224,7 @@ class SessionPlanReviewPage(ttk.Frame):
         """
         
         self.customer=customer
-        self.trainingplanjson = trainingplanjson
+        self.trainingplan=trainingplan
 
         try:
             self.master_frame.grid_forget()
@@ -234,11 +233,8 @@ class SessionPlanReviewPage(ttk.Frame):
         self.master_frame = ttk.Frame(self)
         self.master_frame.grid(row=5,column=0)
 
-        self.info_label["text"] = f"Session Plan for {self.customer.name}\nLast modified: {self.trainingplanjson['timestamp']}\nPlanned date: {self.trainingplanjson['planned_date']}"
+        self.info_label["text"] = f"Session Plan for {self.customer.name}\nLast modified: {self.trainingplan.timestamp}\nPlanned date: {self.trainingplan.planned_date}"
 
         # list all circuits across the page
-        column=0
-        row=0
-        for i,self.circuit in enumerate(self.trainingplanjson["circuits"]):
-            self.ListCircuit(self,i, row, column)
-            column+=1
+        for column,circuit in enumerate(self.trainingplan.circuits):
+            self.ListCircuit(self.master_frame, circuit, column)

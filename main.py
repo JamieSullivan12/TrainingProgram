@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-import UI_HomePage, UI_TraineePage, UI_AddCustomerpage, UI_TraineeInfoPage, UI_TrainingPlanViewerPage
+import UI_HomePage, UI_TraineePage, UI_AddCustomerpage, UI_TraineeInfoPage, UI_TrainingPlanViewerPage, UI_ModifyExercises
 import pandas as pd
 import Process_DataStructures
 
@@ -45,14 +45,15 @@ class GUI(ttk.Frame):
         # function that tracks ALL clicks on the Tkinter window
         self.tracker.link_scrollable_frame(self.frame_obj)
 
-        # initialising customer data
-        self.customerdata_obj = Process_DataStructures.CustomerData()
-        self.customerdata_dict = self.customerdata_obj.traineedata
+
         # initialising exercises data
         self.data_obj = Process_DataStructures.Data()
         self.exercisedata_dict = self.data_obj.exercisedata
         # initialising category data
         self.categorydata_dict = self.data_obj.categoriesdata
+        # initialising customer data
+        self.customerdata_obj = Process_DataStructures.CustomerData(self)
+        self.customerdata_dict = self.customerdata_obj.traineedata
 
         # create all pages that the user can navigate to
         self.setupwindows()
@@ -90,8 +91,7 @@ class GUI(ttk.Frame):
     Initialise all GUI classes
     '''
     def setupwindows(self):
-        # calling on other page classes means commands will be pre-loaded== that are not available yet (such as page loading)
-        # ignore_setup will make sure these effects are not run
+        # when other GUI pages are initialised, they may begin trying to change the active page (using showwindow() method). this is prevented using the ignore_setup flag.
         self.ignore_setup=True 
         
         # store all created frames (top level containers) in a dictionary.
@@ -99,15 +99,14 @@ class GUI(ttk.Frame):
         self.frames={}
 
         # loop through all imported GUI objects (from other files)
-        pages = [UI_HomePage.HomePage,UI_TraineePage.CustomerPage,UI_AddCustomerpage.AddCustomerPage, UI_TraineeInfoPage.MoreInfoPage,UI_TrainingPlanViewerPage.SessionPlanReviewPage]
+        pages = [UI_HomePage.HomePage,UI_TraineePage.CustomerPage,UI_AddCustomerpage.AddCustomerPage, UI_TraineeInfoPage.MoreInfoPage,UI_TrainingPlanViewerPage.SessionPlanReviewPage, UI_ModifyExercises.ModifyExercisesPage]
         for page in pages:
             # if page already has been initalised, remove it
             if page.__name__ in self.frames:
                 self.frames[page.__name__].grid_forget()
             page_name = page.__name__
 
-            # initalise the GUI object
-            # self is passed as a "parent class"
+            # initalise the GUI object. self is passed as a "parent class"
             frame = page(self)
 
             # keep track of the initialised pages in a dict {page name: frame}
@@ -117,54 +116,51 @@ class GUI(ttk.Frame):
 
 
     '''
-    Will remove any frames on the grid and then place the requested frame on the grid
+    Will place a requested frame (passed as an argument) on the user's viewing window
+    - Note that all GUI objects must inherit the ttk.Frame class for this to work
     '''
     def showwindow(self, frame_name):
+        # see setupwindows() method for description of self.ignore_setup
         if not self.ignore_setup:
-            
-            
+            # remove ALL frames from the viewing window
             for frame in self.frames:
                 self.frames[frame].grid_forget()
-
+            # keep track of which frame is currently being shown to the user
             self.current_frame = frame_name
-            frame = self.frames[frame_name]
-            self.current_frame_object = frame
-            frame.grid(row=0,column=0)
+            self.current_frame_object = self.frames[frame_name]
+            # place the requested frame on the window
+            self.current_frame_object.grid(row=0,column=0)
+            # update ALL widget elements
             self.frame_obj.update()
 
 
 
-    '''
-    Class to create a frame which can be scrolled (usually used for listing items on the window etc.)
-    A special class needs to be used because to create a scrollable frame in tkinter, it must be
-    placed on a canvas which must be linked to a scrollbar.
-    '''
-    class CreateScrollableFrame(ttk.Frame):
 
-        def __init__(self,parent,row=0, column=0,columnspan=1,rowspan=1, height=0, width=0, border_text="",padx=15,pady=5):
-            super().__init__(parent.container)
+    class CreateScrollableFrame(ttk.Frame):
+        '''
+        Class to create a frame which can be scrolled through (complicated structure using a tkinter canvas widget).
+        '''
+        def __init__(self,parent):
             self.parent=parent
 
-
+            # inherit all attributes & methods from the ttk.Frame widget
+            super().__init__(self.parent.container)
+            
+            # create the canvas, vertical and horizontal scrollbar
             self.scrollable_canvas = tk.Canvas(parent.container, bd=0, highlightthickness=0)
             self.scrollbar = ttk.Scrollbar(self.parent.container, orient="vertical", command=self.scrollable_canvas.yview)
             self.hscrollbar = ttk.Scrollbar(self.parent.container, orient="horizontal", command=self.scrollable_canvas.xview)
-
             self.scrollable_frame = ttk.Frame(self.scrollable_canvas)
-
-
-            self.bind("<Configure>", lambda e: self.scrollable_canvas.configure(scrollregion = self.scrollable_canvas.bbox("all")))
-
+            # place the frmae on the canvas
             self.scrollable_canvas.create_window((0,0), window=self.scrollable_frame, anchor='nw')
-
+            # setup the scrolling actions
+            self.bind("<Configure>", lambda e: self.scrollable_canvas.configure(scrollregion = self.scrollable_canvas.bbox("all")))
             self.scrollable_canvas.configure(yscrollcommand=self.scrollbar.set)
             self.scrollable_canvas.configure(xscrollcommand=self.hscrollbar.set)
             self.hscrollbar.grid(row=1, column=0, sticky="ew")
             self.scrollbar.grid(row=0, column=1, sticky="ns")
-            
             self.scrollable_canvas.grid(row=0, column=0, sticky="nsew")
-            
-            
+            # bind mousewheel to scrolling action
             self.bind_all("<MouseWheel>", self._on_mousewheel)
             
             self.update()
@@ -184,33 +180,20 @@ class GUI(ttk.Frame):
             if self.vscrollable:
                 self.scrollable_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
-        '''
-        Changes the width of the canvas and master_container to the frame inside of it (used when the frame changes size).
-        This is required because the canvas does not automatically change width. The canvas scroll region is also updated,
-        and the adjust_scrollbar function is called (see function description).
-        '''
+
         def update(self):
+            """
+            Update the scrollwheels on the scrollable frame to match contents
+            """
             self.parent.parent.update_idletasks()
             if self.parent.container.winfo_height() >= self.scrollable_frame.winfo_height()+20:
-                self.vscrollable=False # scrollable parameter checked when user scrolls. Will prevent when False
+                self.vscrollable=False
             else:
                 self.vscrollable=True
 
             self.scrollable_canvas.update_idletasks()
             self.scrollable_canvas.config(scrollregion=self.scrollable_frame.bbox())
             
-        '''
-        Removes the scrollbar if the frame size is big enough
-        '''
-        def adjust_scrollbar(self,event):
-            self.parent.parent.update_idletasks()
-            self.scrollable_frame.update()
-
-                
-            if self.parent.container.winfo_height() >= self.scrollable_frame.winfo_height()+20:
-                self.vscrollable=False # scrollable parameter checked when user scrolls. Will prevent when False
-            else:
-                self.vscrollable=True
 
 # only run the following code if it has been initialised by the user
 if __name__ == '__main__':

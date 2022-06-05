@@ -16,15 +16,15 @@ class MoreInfoPage(ttk.Frame):
 
     class SessionPlanRow():
         def see_session_details_clicked(self):
-            self.controller.controller.frames["SessionPlanReviewPage"].injectdata(self.sessionplan_json, self.controller.customer)
+            self.controller.controller.frames["SessionPlanReviewPage"].injectdata(self.training_plan, self.controller.customer)
             self.controller.controller.showwindow("SessionPlanReviewPage")
 
-        def __init__(self,controller, sessionplan_json,row):
-            self.sessionplan_json=sessionplan_json
+        def __init__(self,controller, training_plan,row):
+            self.training_plan=training_plan
             self.controller=controller
             self.row_container = ttk.Frame(self.controller.session_frame)
 
-            self.heading=ttk.Label(self.row_container,text=f"Session Plan Generated: {sessionplan_json['timestamp']}")
+            self.heading=ttk.Label(self.row_container,text=f"Session Plan Generated: {self.training_plan.timestamp}")
             self.sesessiondetails_button = ttk.Button(self.row_container,text="See Session Details",command=self.see_session_details_clicked)
             self.sesessiondetails_button.grid(row=0,column=1,padx=30,pady=20)
             self.seperator = ttk.Separator(orient="horizontal")
@@ -90,11 +90,12 @@ class MoreInfoPage(ttk.Frame):
         self.customer.writetofile()
 
     def create_sessionplan(self):
-        training_plan_obj = Process_CreateTrainingPlan.TrainingPlanCreator(self.customer, self.controller)
-        training_plan_obj.createtrainingplan(number_of_circuits=self.number_of_circuits, number_of_supersets=self.number_of_supersets, number_of_sets=self.number_of_sets, planned_date = self.planned_date)
-        print(training_plan_obj.trainingplanjson)
-        self.controller.frames["SessionPlanReviewPage"].injectdata(training_plan_obj.trainingplanjson, self.customer)
-        self.controller.showwindow("SessionPlanReviewPage")
+        training_plan_obj = Process_CreateTrainingPlan.TrainingPlan(self.controller, self.customer, self.planned_date)
+        training_plan_obj.generate_training_plan(number_of_circuits=self.number_of_circuits, number_of_supersets=self.number_of_supersets, number_of_sets=self.number_of_sets)
+        
+        if training_plan_obj.not_enough_exercises_error == False:
+            self.controller.frames["SessionPlanReviewPage"].injectdata(training_plan_obj, self.customer)
+            self.controller.showwindow("SessionPlanReviewPage")
     
     
     def changecircuitsvalue(self,*args):

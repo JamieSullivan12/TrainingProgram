@@ -1,10 +1,6 @@
 import tkinter as tk
-from tkinter import ttk
-from datetime import datetime
-
-
 import json
-
+from Process_CreateTrainingPlan import TrainingPlan
 
 import pandas as pd
 
@@ -53,17 +49,15 @@ class Data():
             self.exerciseobjects[exercise_data_object.ID] = exercise_data_object
 
     def __init__(self):
-
         self.categoriesfile = pd.read_csv("categoriesdatabase.csv")
         self.categoriesfile = self.categoriesfile.fillna('')
         self.categoriesdata={} # dictionary used to store generated CategoryData objects
         # loop through all Categories and instantiate an object for each one
         i=0
         while i < len(self.categoriesfile):
-            exercisedata_obj = self.CategoryData(self.categoriesfile, i)
-            self.categoriesdata[exercisedata_obj.ID] = exercisedata_obj
+            categorydata_obj = self.CategoryData(self.categoriesfile, i)
+            self.categoriesdata[categorydata_obj.ID] = categorydata_obj
             i += 1
-
 
         self.exercisefile = pd.read_csv("exercisedatabase.csv")
         self.exercisefile = self.exercisefile.fillna('')
@@ -81,19 +75,14 @@ class Data():
 
 
 
-
-
 class CustomerData():
     
     class Trainee():
-        """
-            Initialise a Trainee object.
+        """Initialise a Trainee object.
             - pandas_index = CSV row which is being read
-            - pandas_data = entire pandas dataset of the CSV data
-            - 
-        """
-        def __init__(self, pandas_data, pandas_index):
-            
+            - pandas_data = entire pandas dataset of the CSV data"""
+        
+        def __init__(self, master_controller, pandas_data, pandas_index):    
             self.pandas_index=pandas_index
             self.pandas_data=pandas_data
 
@@ -106,14 +95,22 @@ class CustomerData():
             if str(self.ability_level) == "": self.ability_level = 1 # set default AbilityLevel if non-existent
 
             self.training_plans_string = self.pandas_data.at[self.pandas_index, "TrainingPlans"]
+
+            self.training_plans = []
             # read the JSON (TrainingPlans) into a list-dictionary datastructure in Python
-            if self.training_plans_string != "":self.training_plans = json.loads(self.training_plans_string)
-            else: self.training_plans=[] # default to an empty list
+            if self.training_plans_string != "":
+                training_plans_with_string = json.loads(self.training_plans_string)     
+                for training_plan in training_plans_with_string:
+                    training_plan_obj = TrainingPlan(master_controller, self)
+                    training_plan_obj.import_from_dict(training_plan)
+                    self.training_plans.append(training_plan_obj)
+            print(self.training_plans)
 
             self.goals_string = self.pandas_data.at[self.pandas_index, "Goals"]
             # read the JSON (Goals) which are a currently a list representation in a string into a python list
             if self.goals_string != "":self.goals = json.loads(self.goals_string)
             else:self.goals=[] # default to an empty list
+
 
         def writetofile(self):
             #try:
@@ -124,14 +121,16 @@ class CustomerData():
             self.pandas_data.at[self.pandas_index,"Goals"]=str(self.goals)
             self.pandas_data.at[self.pandas_index,"AbilityLevel"]=str(self.ability_level)
 
+            training_plans_with_string = []
+            for training_plan in self.training_plans:
+                training_plans_with_string.append(training_plan.export_to_string())
 
-            self.pandas_data.at[self.pandas_index,"TrainingPlans"]=json.dumps(self.training_plans)
+            self.pandas_data.at[self.pandas_index,"TrainingPlans"]=json.dumps(training_plans_with_string)
 
             # write the object to a CSV
             self.pandas_data.to_csv("traineedata.csv", index=False)
             tk.messagebox.showinfo(message="Sucessfully made changes")
-            #except Exception as e:
-            #    tk.messagebox.showerror(message="Error(s) occured:\n\n" + str(e))
+
 
 
         def setDoB(self,new):
@@ -154,7 +153,7 @@ class CustomerData():
                 if plan["timestamp"] == session_plan["timestamp"]:
                     self.training_plans.remove(plan)
 
-    def __init__(self):
+    def __init__(self, master_controller):
         self.cusomter_pd = pd.read_csv("traineedata.csv")
         self.cusomter_pd = self.cusomter_pd.fillna('') #replace empty fields (which would normally show NaN) with ""
         # format the Date of Birth as a date
@@ -166,7 +165,7 @@ class CustomerData():
         # loop through each row/trainee in the datastructure
         while i < len(self.cusomter_pd):
             # create an object for each customer
-            trainee_obj = self.Trainee(self.cusomter_pd, i)
+            trainee_obj = self.Trainee(master_controller, self.cusomter_pd, i)
             self.traineedata[trainee_obj.ID]=trainee_obj
             i = i + 1
 
