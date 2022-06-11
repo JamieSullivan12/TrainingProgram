@@ -1,4 +1,4 @@
-from random import randint
+import random
 import datetime
 from tokenize import Triple
 from tkinter import messagebox
@@ -27,34 +27,39 @@ class TrainingPlan():
         def round(self,x, base=5):
             return base * round(x/base)
 
-        def __init__(self, parent_controller, exercisedataset, override_data=""):
-
-            """Will create a requested number of sets based on the following parameters:
-            - number_of_sets: number of sets to exist WITHIN a SINGLE SUPERSET
-            Note: exercises for each set will be chosen randomly. Duplicates are avoided"""
+        def __init__(self, parent_controller, exercisedataset, import_data=""):
+            """
+            Will create a set. All functions required to generate a set are completed in this class:
+            - randomly selecting a set from the list of available exercises (parameter exercisedataset)
+            - calculating the duration of the set (based on the set type and trainee ability level)
+            NOTE: import_data can be passed in case an existing set needs to be read into this class. The
+                set must be in the format {ID:String, Length:String, OverrideName:String, OverrideLength:String}.
+            """
 
             self.parent_controller=parent_controller
 
-
-            # the type of length of a set (reps, time distance) are defined by the "type" parameter in the ExerciseData database (1,2=reps, 3,4=time, 5=distance, 6=long run)
+            # the length/duration of a set can take on three types:
             self.reps=0 # repetitions
             self.time=0 # seconds
             self.distance=0 # meters
+
+            # if a customer has manually edited the set, these values will override those orginally defined
             self.overridelength = "0"
             self.overridename = ""
 
+            # if override_data != "" means that the function IS being used to import an already generated class
+            # this means that instead of randomly choosing a set from the ExerciseData class, the already defined
+            # exercise ID needs to be linked as an aggregation relationship with the ExerciseData class
             changelength=""
-            if override_data != "":
-                if override_data["OverrideName"] != "": self.overridename = override_data["OverrideName"]
-                if override_data["OverrideLength"] != "": self.overridelength = override_data["OverrideLength"]
-
+            if import_data != "":
+                if import_data["OverrideName"] != "": self.overridename = import_data["OverrideName"]
+                if import_data["OverrideLength"] != "": self.overridelength = import_data["OverrideLength"]
+                # search for a link between the ID of the imported exercise and the class ExerciseData
                 for exercise_id in self.parent_controller.master_controller.exercisedata_dict:
                     exercise = self.parent_controller.master_controller.exercisedata_dict[exercise_id]
-
-                    if str(exercise.ID) == override_data["ID"]:
+                    if str(int(exercise.ID)) == import_data["ID"]:
                         self.exercise_obj = exercise
-                changelength = override_data["Length"]
-
+                changelength = import_data["Length"]
 
             else:
                 # check if there are enough exercises left in the database to fill the requested number of circuits/supersets/sets.
@@ -62,12 +67,14 @@ class TrainingPlan():
                     parent_controller.not_enough_exercises_error = True
                     return
 
-                # choose a random exercise from the available selection (using randint library)
-                random_no = randint(0,len(exercisedataset)-1)
-                self.exercise_obj = self.parent_controller.master_controller.exercisedata_dict[exercisedataset[random_no]]
-                # remove the randomly chosen exercise from the dictionary of possible exercises for this training plan. This is so that it is not duplicated.
-                del exercisedataset[random_no]
+                # choose a random exercise from the available selection of ExerciseData objects (using randint library)
+                self.exercise_obj=random.choice(list(self.parent_controller.master_controller.exercisedata_dict.values()))
+                #random_no = randint(0,len(exercisedataset)-1)
+                #self.exercise_obj = self.parent_controller.master_controller.exercisedata_dict[exercisedataset[random_no]]
 
+            # calculate the duration of each set (based on the type of exercise and customer ability level)
+            # NOTE that the first if statement makes sure to ignore the following block of code if the funciton is being run as
+            # an import function.
             if str(self.overridelength) != 0 and str(self.overridelength) != "" and str(self.overridelength) != None:
                 if self.exercise_obj.type==1 or self.exercise_obj.type==2:
                     self.reps=str(self.round(10*self.parent_controller.traineeobj.ability_level,base=5))
@@ -90,31 +97,40 @@ class TrainingPlan():
             return None
 
     class Superset():
-        def __init__(self, parent_controller, exercisedataset, override_data = ""):
+        def __init__(self, parent_controller, exercisedataset, import_data = ""):
+            # store an aggregation of sets within each superset object
             self.sets = []
 
-            if override_data != "":
-                for set in override_data["sets"]:
-                    self.sets.append(parent_controller.Set(parent_controller, exercisedataset, override_data=set))
-            
-            else:
+            if import_data == "":
+              # create a certain number of sets (by instantiating the Sett() class and storing them in an array, here)
                 count = 0
                 while count < parent_controller.number_of_sets:
                     self.sets.append(parent_controller.Set(parent_controller, exercisedataset))
                     count = count + 1
+            
+            else:
+                for set in import_data["sets"]:
+                    self.sets.append(parent_controller.Set(parent_controller, exercisedataset, import_data=set))
+
+  
 
     class Circuit():
-        def __init__(self, parent_controller, exercisedataset, override_data = ""):
+        def __init__(self, parent_controller, exercisedataset, import_data = ""):
+            # store the aggregation of supersets for each circuit object
             self.supersets = []
 
-            if override_data != "":
-                for superset in override_data["supersets"]:
-                    self.supersets.append(parent_controller.Superset(parent_controller, exercisedataset, override_data=superset))
-            else:
+            # if there is no import data, a training plan needs to be GENERATED (instantiating the Superset class)
+            if import_data == "":
                 count = 0
                 while count < parent_controller.number_of_supersets:
                     self.supersets.append(parent_controller.Superset(parent_controller, exercisedataset))
                     count = count + 1
+
+
+            else:
+                for superset in import_data["supersets"]:
+                    self.supersets.append(parent_controller.Superset(parent_controller, exercisedataset, import_data=superset))
+            
 
     def generate_training_plan(self, number_of_sets, number_of_supersets, number_of_circuits,):
 
@@ -131,6 +147,8 @@ class TrainingPlan():
                 self.validexerciseIDs.append(exercise_id)
 
         count = 0
+        # instantiate the required number of Circuit objects (loop count from 0 to self.number_of_circuits)
+        # and store in a list of circuits (attributed to the TrainingPlan class)
         while count < self.number_of_circuits:
             self.circuits.append(self.Circuit(self, exercisedataset = self.validexerciseIDs))
             count = count + 1
@@ -169,7 +187,7 @@ class TrainingPlan():
         self.planned_date = importstring["planned_date"]
         for circuit in self.importstring["circuits"]:
             print(circuit)
-            self.circuits.append(self.Circuit(self, exercisedataset = self.master_controller.exercisedata_dict, override_data=circuit))
+            self.circuits.append(self.Circuit(self, exercisedataset = self.master_controller.exercisedata_dict, import_data=circuit))
         self.export_to_string()
 
 

@@ -1,21 +1,30 @@
 
+from doctest import master
 from email import message
 from encodings import search_function
 import tkinter as tk
+from tkinter import *
 from tkinter import ttk
 import main
 import tkinter.messagebox
 import pandas as pd
 from datetime import datetime,date
+import reuseable_dropdownpopup
 from Process_ExercisesAPI import load_data
-
+import random
 
 class ModifyExercisesPage(ttk.Frame):
 
 
     class APIGeneratedExerciseRow():
-        def __init__(self,controller,row_num,exercise):
-            self.customer=exercise
+        def bindframe(self,frame,sequence,func):
+            frame.bind(sequence, func)
+            for child in frame.winfo_children():
+                child.bind(sequence, func)
+
+        def __init__(self,master_controller, controller,row_num,exercise):
+            self.exercise=exercise
+            self.master_controller=master_controller
             self.controller=controller
             # creating child frame in which individual customer rows will appear
             self.exercise_frame = ttk.Frame(self.controller)
@@ -29,7 +38,59 @@ class ModifyExercisesPage(ttk.Frame):
             
             self.bottom_seperator.grid(row=2,column=0,columnspan=100,sticky="ew")
             self.exercise_frame.grid(row=row_num,column=0,columnspan=100,sticky="ew",padx=40)
+            self.bindframe(self.exercise_frame,"<Double-Button-1>",lambda e:self.new_exercise_click())
 
+        def new_exercise_click(self):
+
+            category_names = []
+            for category in self.master_controller.categorydata_dict:
+                category_names.append(self.master_controller.categorydata_dict[category].category)
+            
+            dropdown_choices = set(category_names)
+            reuseable_dropdownpopup.dropdownselect(self.category_selection,f"Please select what category '{self.exercise.name}' fits in to", dropdown_choices)
+
+
+        def category_selection(self, selection):
+            self.selected_category_obj = ""
+            for category in self.master_controller.categorydata_dict:
+                if self.master_controller.categorydata_dict[category].category == selection:
+                    self.selected_category_obj = self.master_controller.categorydata_dict[category]
+            
+            if selection == "Make a selection":
+                tkinter.messagebox.showerror(message="Please make a selection")
+                self.new_exercise_click()
+
+            type_names = []
+            for type in self.master_controller.types:
+                type_names.append(self.master_controller.types[type])
+            
+
+            dropdown_choices = set(type_names)
+            reuseable_dropdownpopup.dropdownselect(self.type_selection,f"Please select what format '{self.exercise.name}' is", dropdown_choices)
+
+
+        def type_selection(self, type_selection):
+            exercise_index = self.master_controller.data_obj.get_current_exercise_index()
+
+            if type_selection == "Make a selection":
+                tkinter.messagebox.showerror(message="Please make a selection")
+                self.new_exercise_click()
+
+            self.selected_type = ""
+            for type in self.master_controller.types:
+                if self.master_controller.types[type] == type_selection:
+                    self.selected_type = type
+            
+
+
+            id = random.randint(0,999999)
+            while id in self.master_controller.exercisedata_dict:
+                id = random.randint(0,999999)
+            
+            self.master_controller.exercisedata_dict[id] = self.master_controller.data_obj.ExerciseData(self.master_controller.data_obj.exercisefile, exercise_index,self.master_controller.categorydata_dict)
+            self.master_controller.exercisedata_dict[id].create_new(id,self.exercise.name,self.selected_type,self.selected_category_obj)
+
+            self.master_controller.exercisedata_dict[id].writetofile()
 
     def save_changes(self, customers):
         '''
@@ -69,9 +130,6 @@ class ModifyExercisesPage(ttk.Frame):
             except PermissionError as e:
                 tkinter.messagebox.showerror(title="Unable to save changes", message="Please ensure that the core data file is not open and try again.")
     
-
-
-
     def set_heading(self):
         self.controller.tkRoot.title("Training App > Customers")
 
@@ -93,9 +151,7 @@ class ModifyExercisesPage(ttk.Frame):
             self.SearchFunction()
         self.loading_label.grid_forget()
         self.retrieve_online_button.grid(row=0,column=0,columnspan=2,sticky="ew")
-
-
-    
+ 
     def SearchFunction(self, override = False):
         if override:
             self.search_texbox.delete(0, 'end')
@@ -120,22 +176,19 @@ class ModifyExercisesPage(ttk.Frame):
             for exercise in self.API_exercise_objects:
                 
                 if search_filter.lower()=="all" or search_filter.lower() in self.API_exercise_objects[exercise].name.lower():
-                    self.listofrows.append(self.APIGeneratedExerciseRow(self.add_exercise_online_frame,row_num,self.API_exercise_objects[exercise]))
+                    self.listofrows.append(self.APIGeneratedExerciseRow(self.controller,self.add_exercise_online_frame,row_num,self.API_exercise_objects[exercise]))
                 row_num+=1
             if row_num == 3: tkinter.messagebox.showinfo(message="No results for '" + search_filter.lower() + "'")
         self.update()
 
         self.controller.frame_obj.update()
 
-
-
-
     def __init__(self, controller):
         ttk.Frame.__init__(self, controller.frame_obj.scrollable_frame)
         self.controller = controller
 
         title = ttk.Label(self, text="Exercises")
-        title.grid(row=0,column=0, padx=(40,10), pady=(10,0), sticky="w")
+        title.grid(row=0,column=0, padx=(20,10), pady=(10,0), sticky="w")
 
         self.add_exercise_manual_frame = ttk.LabelFrame(self,text="Manually Add Exercise")
 
@@ -145,14 +198,10 @@ class ModifyExercisesPage(ttk.Frame):
         self.retrieve_online_button = ttk.Button(self.add_exercise_online_frame,text="Retrieve Data", command = self.RetrieveData)
         self.retrieve_online_button.grid(row=0,column=0,columnspan=2,sticky="ew")
 
-        self.add_exercise_online_frame.grid(row=1,column=1)
+        self.add_exercise_online_frame.grid(row=1,column=0, padx=20, pady=15)
 
         self.search_message = ttk.Label(self.add_exercise_online_frame, text="Please enter a search request above")
         self.search_texbox = ttk.Entry(self.add_exercise_online_frame, width=50)
         self.search_texbox.grid(row=1,column=0,padx=(10,0))
         self.search_button = ttk.Button(self.add_exercise_online_frame,text="Search", width=30,command=lambda:self.SearchFunction())
         self.search_button.grid(row=1,column=1, padx=(20,10),pady=10)
-        
-        # used to store all customer row objects
-        #self.listofrows=[]
-        #self.searchfunction()

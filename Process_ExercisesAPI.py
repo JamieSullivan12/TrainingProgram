@@ -25,7 +25,6 @@ class ExercisesAPI():
 
 
 def load_data():
-    load_local=False
     headers = {'Accept': 'application/json','Authorization': 'Token 8b33edb3c3f6921d2e3f099cdb9a9fa190570721',"language":"en"}
 
     #getting the exercise categories using the API
@@ -33,6 +32,7 @@ def load_data():
     excercises_objects = {}
     cont = False
     timeout = 0
+
     while cont == False:
         try:
             exercise_categories_response = requests.get("https://wger.de/api/v2/exercisecategory", headers=headers)
@@ -55,12 +55,13 @@ def load_data():
     #f = open("exercises.json","w")
 
     
-
+    count = 0
     exercises_json_list=[]
     for category_id in category_dict:
         print("fdjgn")
         link = f"https://wger.de/api/v2/exercise/?category={category_id}&language=2"
         timeout = 0
+        
         while link != None: #link becomes None when no more pages are available to be loaded
             print("loading")
             #accessing API
@@ -80,6 +81,9 @@ def load_data():
                 print("I got here")
                 timeout += 1
             if timeout > 10: return excercises_objects
+
+        if count > 0: return excercises_objects
+        count += 1
 
                 
 

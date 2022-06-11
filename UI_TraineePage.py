@@ -42,8 +42,8 @@ class CustomerPage(ttk.Frame):
             # customer name and date of birth
             self.name_label = ttk.Label(self.customer_frame,text=customer.name)
             self.name_label.grid(row=0, column=0, padx=(20,60),pady=20)
-            self.DoB_label = ttk.Label(self.customer_frame, text=f'{customer.DoB.day}/{customer.DoB.month}/{customer.DoB.year}')
-            self.DoB_label.grid(row=0, column=1)
+            self.email_label = ttk.Label(self.customer_frame, text=f'{customer.email}')
+            self.email_label.grid(row=0, column=1)
 
             self.bottom_seperator.grid(row=2,column=0,columnspan=100,sticky="ew")
             self.customer_frame.grid(row=row_num,column=0,columnspan=100,sticky="ew",padx=40)

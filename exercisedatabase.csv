@@ -1,42 +1,47 @@
 ID,Descriptor,Type,Category
-1,Barbell Squats,1,1
-2,Goblet Squats,1,1
-3,Seated Squats,1,1
-4,Frog Squats,1,1
-5,Dead Lifts,1,1
-6,Step-Ups,2,1
-7,Bulgarian Squats,2,1
-8,Walking Lunges,2,1
-9,Alternating Static Lunges,2,1
-10,TRX Pistol Squats,2,1
-11,TRX Jumping Squats,1,1
-12,Seated Pistol Squats,1,1
-13,Bicep Curls,1,2
-14,TRX Close Grip Pull-Ups,1,2
-15,TRX Wide Grip Pull-Ups,1,2
-16,Single Arm Bent Over Row,2,2
-17,Bench Pull-Ups,1,2
-18,Bench Press,1,3
-19,Push-Ups,1,3
-20,Dips,1,3
-21,Shoulder Press,1,3
-22,Lateral Raises,1,3
-23,Front Raises,1,3
-24,Skull Crushes,1,3
-25,Ab Climbers,2,4
-26,Plank Walk-outs,1,4
-27,Ab Roller,1,4
-28,Front Elbow Plank,3,4
-29,Front Hands Plank,3,4
-30,Side Plank,4,4
-31,Ball Tucks,1,4
-32,Russian Twist,2,4
-33,Ball Toe Taps,2,4
-34,Single Battle Ropes,1,5
-35,Double Battle Ropes,2,5
-36,Rope Jump Slams,1,5
-37,Ball Slams,1,5
-38,Burpees,1,5
-39,Sprints,5,5
-40,Shuttle Runs,1,5
-41,Long Distance Run,6,5
+1.0,Barbell Squats,1.0,1.0
+2.0,Goblet Squats,1.0,1.0
+3.0,Seated Squats,1.0,1.0
+4.0,Frog Squats,1.0,1.0
+5.0,Dead Lifts,1.0,1.0
+6.0,Step-Ups,2.0,1.0
+7.0,Bulgarian Squats,2.0,1.0
+8.0,Walking Lunges,2.0,1.0
+9.0,Alternating Static Lunges,2.0,1.0
+10.0,TRX Pistol Squats,2.0,1.0
+11.0,TRX Jumping Squats,1.0,1.0
+12.0,Seated Pistol Squats,1.0,1.0
+13.0,Bicep Curls,1.0,2.0
+14.0,TRX Close Grip Pull-Ups,1.0,2.0
+15.0,TRX Wide Grip Pull-Ups,1.0,2.0
+16.0,Single Arm Bent Over Row,2.0,2.0
+17.0,Bench Pull-Ups,1.0,2.0
+18.0,Bench Press,1.0,3.0
+19.0,Push-Ups,1.0,3.0
+20.0,Dips,1.0,3.0
+21.0,Shoulder Press,1.0,3.0
+22.0,Lateral Raises,1.0,3.0
+23.0,Front Raises,1.0,3.0
+24.0,Skull Crushes,1.0,3.0
+25.0,Ab Climbers,2.0,4.0
+26.0,Plank Walk-outs,1.0,4.0
+27.0,Ab Roller,1.0,4.0
+28.0,Front Elbow Plank,3.0,4.0
+29.0,Front Hands Plank,3.0,4.0
+30.0,Side Plank,4.0,4.0
+31.0,Ball Tucks,1.0,4.0
+32.0,Russian Twist,2.0,4.0
+33.0,Ball Toe Taps,2.0,4.0
+34.0,Single Battle Ropes,1.0,5.0
+35.0,Double Battle Ropes,2.0,5.0
+36.0,Rope Jump Slams,1.0,5.0
+37.0,Ball Slams,1.0,5.0
+38.0,Burpees,1.0,5.0
+39.0,Sprints,5.0,5.0
+40.0,Shuttle Runs,1.0,5.0
+41.0,Long Distance Run,6.0,5.0
+65357.0,Full Sit Outs,1.0,4.0
+921903.0,Barbell Ab Rollout,1.0,4.0
+350414.0,Side Plank,3.0,4.0
+447463.0,Side Plank,3.0,4.0
+830704.0,2 Handed Kettlebell Swing,1.0,2.0

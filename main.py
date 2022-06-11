@@ -67,10 +67,15 @@ class GUI(ttk.Frame):
         self.menubar.add_cascade(label="Settings", menu=self.optionsmenu)
         self.navigate = tk.Menu(self.menubar, tearoff=False)
         self.navigate.add_command(label="Home", command=lambda:self.showwindow("HomePage"))
-        self.navigate.add_command(label="Customer Page", command=lambda:self.showwindow("CustomerPage"))
+        self.navigate.add_command(label="Trainee Search", command=lambda:self.showwindow("CustomerPage"))
+        self.navigate.add_command(label="Add Trainee", command=lambda:self.showwindow("AddCustomerPage"))
+        self.navigate.add_command(label="Add Exercise", command=lambda:self.showwindow("ModifyExercisesPage"))
+
         self.menubar.add_cascade(label="Navigate", menu=self.navigate)
         self.parent.config(menu=self.menubar)
         
+        # types of exercise codes
+        self.types = {1:"reps",3:"time",5:"distance",6:"long distance"}
 
 
         self.container.pack(side='top', fill='both', expand=True)
@@ -202,6 +207,7 @@ if __name__ == '__main__':
     root.withdraw()
     parent = tk.Toplevel(master=root)
     root.title("Training App")
+    parent.geometry('900x600')
     tracker = Tracker(parent)
     tracker.bind_config()
     # setup UI styling
