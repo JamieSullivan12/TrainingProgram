@@ -119,6 +119,10 @@ class GUI(ttk.Frame):
            
         self.ignore_setup=False
 
+    def resetwindows(self):
+        for frame in self.frames:
+            self.frames[frame].grid_forget()
+        self.setupwindows()
 
     '''
     Will place a requested frame (passed as an argument) on the user's viewing window

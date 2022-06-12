@@ -20,9 +20,9 @@ class AddCustomerPage(ttk.Frame):
         new_trainee_obj.create_trainee_object(id, name, email)
         self.controller.customerdata_dict[id] = new_trainee_obj
 
+        self.controller.resetwindows()
         self.controller.showwindow("HomePage")
-        self.controller.setupwindows()
-        
+
     
     def __init__(self, controller):
         ttk.Frame.__init__(self, controller.frame_obj.scrollable_frame)
