@@ -1,3 +1,6 @@
+Version 1.6
+- Training plan would not save on a new trainee
+
 Version 1.5
 - Issue when saving two or more new trainees or exercises
 - Root window name updated

@@ -147,7 +147,7 @@ class Trainee():
 
     def create_trainee_object(self,id, name, email):
         
-        self.id=id
+        self.ID=id
         self.name=name
         self.email=email
         self.DoB=""
@@ -155,7 +155,7 @@ class Trainee():
         self.training_plans=[]
         self.goals=[]
 
-        new_row_dataframe = {'ID':self.id,'Name': self.name, 'DoB': self.DoB, 'Email': self.email, 'Goals':self.goals, 'AbilityLevel':self.ability_level}
+        new_row_dataframe = {'ID':self.ID,'Name': self.name, 'DoB': self.DoB, 'Email': self.email, 'Goals':self.goals, 'AbilityLevel':self.ability_level}
 
         self.controller.cusomter_pd = self.controller.cusomter_pd.append(new_row_dataframe, ignore_index = True)
         self.controller.cusomter_pd.to_csv("traineedata.csv", index=False)
