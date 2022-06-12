@@ -87,49 +87,11 @@ class ModifyExercisesPage(ttk.Frame):
             while id in self.master_controller.exercisedata_dict:
                 id = random.randint(0,999999)
             
-            self.master_controller.exercisedata_dict[id] = self.master_controller.data_obj.ExerciseData(self.master_controller.data_obj.exercisefile, exercise_index,self.master_controller.categorydata_dict)
+            self.master_controller.exercisedata_dict[id] = self.master_controller.data_obj.ExerciseData(self.master_controller.data_obj, exercise_index,self.master_controller.categorydata_dict)
             self.master_controller.exercisedata_dict[id].create_new(id,self.exercise.name,self.selected_type,self.selected_category_obj)
 
             self.master_controller.exercisedata_dict[id].writetofile()
 
-    def save_changes(self, customers):
-        '''
-        FUNCTION: Save all changes the user has made in the customer table
-        IN:
-        - customers: A list of all the customer objects
-        OUT:
-        - None
-        '''
-
-        save_log = ""
-        cancel = False
-
-        for c in customers:
-            if cancel==False: #break value
-                # customer object method to check if changes have been made
-                error_msg,items_changed=customers[c].check_difference()
-                if error_msg!="":cancel=True # if an error occured when checking the differences, break out of the loop
-                #if no errors occured, update all the values for that customer
-                elif len(items_changed)>0 and error_msg=="":
-                
-                    self.controller.customer_df.at[customers[c].pandas_index,"Name"]=customers[c].name
-                    self.controller.customer_df.at[customers[c].pandas_index,"DoB"]=customers[c].DoB
-                    self.controller.customer_df.at[customers[c].pandas_index,"Goals"]=customers[c].goals
-                    self.controller.customer_df.at[customers[c].pandas_index,"Email"]=customers[c].email
-                    save_log+=f"Customer: {customers[c].name} updated.\n"
-
-        if save_log=="" and error_msg=="":
-            tkinter.messagebox.showinfo(title="No changes were made", message="No changes were made")
-        elif save_log=="" and error_msg!="":
-            tkinter.messagebox.showerror(title="An Error Occured!", message=error_msg)
-        elif save_log!="":                
-            self.controller.customer_df.to_csv("tempdata1.csv", index=False)
-            try:
-                self.controller.customer_df.to_csv("tempdata1.csv", index=False)
-                tkinter.messagebox.showinfo(title="Successfully saved changes", message="Your changes were saved:\n\n" + save_log)
-            except PermissionError as e:
-                tkinter.messagebox.showerror(title="Unable to save changes", message="Please ensure that the core data file is not open and try again.")
-    
     def set_heading(self):
         self.controller.tkRoot.title("Training App > Customers")
 

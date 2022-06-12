@@ -17,20 +17,20 @@ class Data():
         - Dictionary of category objects (for relationship linking purposes).
                 Note that the dictionary will be {CategoryData ID: CategoryData object}
         """
-        def __init__(self,pandas_data,pandas_index,category_objects):
-            self.pandas_data=pandas_data
+        def __init__(self,controller,pandas_index,category_objects):
+            self.controller=controller
             self.pandas_index=pandas_index
             self.category_objects=category_objects
         
         def load(self):
 
-            self.ID = str(int(self.pandas_data.at[self.pandas_index, "ID"]))
-            self.descriptor = self.pandas_data.at[self.pandas_index,"Descriptor"]
-            self.type = self.pandas_data.at[self.pandas_index,"Type"]
+            self.ID = str(int(self.controller.exercisefile.at[self.pandas_index, "ID"]))
+            self.descriptor = self.controller.exercisefile.at[self.pandas_index,"Descriptor"]
+            self.type = self.controller.exercisefile.at[self.pandas_index,"Type"]
             
             # create a link with the CategoryData class based on the ID
             # stored in the exercisedata.csv file
-            self.category = self.pandas_data.at[self.pandas_index,"Category"]
+            self.category = self.controller.exercisefile.at[self.pandas_index,"Category"]
             self.categoryobj = self.category_objects[self.category]
             self.categoryobj.linkexercisedata(self)
 
@@ -44,13 +44,13 @@ class Data():
         def writetofile(self):
             #try:
             # insert all variables into the pandas object
-            self.pandas_data.at[self.pandas_index,"ID"]=self.ID
-            self.pandas_data.at[self.pandas_index,"Descriptor"]=self.descriptor
-            self.pandas_data.at[self.pandas_index,"Type"]=self.type
-            self.pandas_data.at[self.pandas_index,"Category"]=self.categoryobj.ID
+            self.controller.exercisefile.at[self.pandas_index,"ID"]=self.ID
+            self.controller.exercisefile.at[self.pandas_index,"Descriptor"]=self.descriptor
+            self.controller.exercisefile.at[self.pandas_index,"Type"]=self.type
+            self.controller.exercisefile.at[self.pandas_index,"Category"]=self.categoryobj.ID
 
             # write the object to a CSV
-            self.pandas_data.to_csv("exercisedatabase.csv", index=False)
+            self.controller.exercisefile.to_csv("exercisedatabase.csv", index=False)
             tk.messagebox.showinfo(message="Sucessfully made changes")
 
 
@@ -93,7 +93,7 @@ class Data():
         # ExerciseData object for each
         self.exercise_index=0
         while self.exercise_index < len(self.exercisefile):
-            exercisedata_obj = self.ExerciseData(self.exercisefile,self.exercise_index, self.categoriesdata)
+            exercisedata_obj = self.ExerciseData(self,self.exercise_index, self.categoriesdata)
             # add object to the dictionary
             exercisedata_obj.load()
             self.exercisedata[exercisedata_obj.ID]=exercisedata_obj
@@ -107,23 +107,22 @@ class Data():
 
 class Trainee():
     """Initialise a Trainee object.
-        - pandas_index = CSV row which is being read
-        - pandas_data = entire pandas dataset of the CSV data"""
+        - pandas_index = CSV row which is being read"""
     
     def read_trainee_object(self):
 
 
-        self.ID = self.pandas_data.at[self.pandas_index, "ID"]
-        self.name = self.pandas_data.at[self.pandas_index, "Name"]
-        self.DoB = self.pandas_data.at[self.pandas_index, "DoB"]
+        self.ID = self.controller.cusomter_pd.at[self.pandas_index, "ID"]
+        self.name = self.controller.cusomter_pd.at[self.pandas_index, "Name"]
+        self.DoB = self.controller.cusomter_pd.at[self.pandas_index, "DoB"]
         
         
-        self.email = self.pandas_data.at[self.pandas_index, "Email"]
+        self.email = self.controller.cusomter_pd.at[self.pandas_index, "Email"]
 
-        self.ability_level = self.pandas_data.at[self.pandas_index, "AbilityLevel"]
+        self.ability_level = self.controller.cusomter_pd.at[self.pandas_index, "AbilityLevel"]
         if str(self.ability_level) == "": self.ability_level = 1 # set default AbilityLevel if non-existent
 
-        self.training_plans_string = self.pandas_data.at[self.pandas_index, "TrainingPlans"]
+        self.training_plans_string = self.controller.cusomter_pd.at[self.pandas_index, "TrainingPlans"]
 
         self.training_plans = []
         # read the JSON (TrainingPlans) into a list-dictionary datastructure in Python
@@ -134,15 +133,15 @@ class Trainee():
                 training_plan_obj.import_from_string(training_plan)
                 self.training_plans.append(training_plan_obj)
 
-        self.goals_string = self.pandas_data.at[self.pandas_index, "Goals"]
+        self.goals_string = self.controller.cusomter_pd.at[self.pandas_index, "Goals"]
         # read the JSON (Goals) which are a currently a list representation in a string into a python list
         if self.goals_string != "":self.goals = json.loads(self.goals_string)
         else:self.goals=[] # default to an empty list
 
 
-    def __init__(self, master_controller, pandas_data, pandas_index):   
+    def __init__(self, master_controller, controller, pandas_index):   
         self.pandas_index=pandas_index
-        self.pandas_data=pandas_data
+        self.controller=controller
         self.master_controller=master_controller
 
 
@@ -158,27 +157,26 @@ class Trainee():
 
         new_row_dataframe = {'ID':self.id,'Name': self.name, 'DoB': self.DoB, 'Email': self.email, 'Goals':self.goals, 'AbilityLevel':self.ability_level}
 
-
-        self.pandas_data = self.pandas_data.append(new_row_dataframe, ignore_index = True)
-        self.pandas_data.to_csv("traineedata.csv", index=False)
+        self.controller.cusomter_pd = self.controller.cusomter_pd.append(new_row_dataframe, ignore_index = True)
+        self.controller.cusomter_pd.to_csv("traineedata.csv", index=False)
 
     def writetofile(self, inhibit_success_msg=False):
         #try:
         # insert all variables into the pandas object
-        self.pandas_data.at[self.pandas_index,"Name"]=self.name
-        self.pandas_data.at[self.pandas_index,"DoB"]=self.DoB
-        self.pandas_data.at[self.pandas_index,"Email"]=self.email
-        self.pandas_data.at[self.pandas_index,"Goals"]=str(self.goals)
-        self.pandas_data.at[self.pandas_index,"AbilityLevel"]=str(self.ability_level)
+        self.controller.cusomter_pd.at[self.pandas_index,"Name"]=self.name
+        self.controller.cusomter_pd.at[self.pandas_index,"DoB"]=self.DoB
+        self.controller.cusomter_pd.at[self.pandas_index,"Email"]=self.email
+        self.controller.cusomter_pd.at[self.pandas_index,"Goals"]=str(self.goals)
+        self.controller.cusomter_pd.at[self.pandas_index,"AbilityLevel"]=str(self.ability_level)
 
         training_plans_with_string = []
         for training_plan in self.training_plans:
             training_plans_with_string.append(training_plan.export_to_string())
 
-        self.pandas_data.at[self.pandas_index,"TrainingPlans"]=json.dumps(training_plans_with_string)
+        self.controller.cusomter_pd.at[self.pandas_index,"TrainingPlans"]=json.dumps(training_plans_with_string)
 
         # write the object to a CSV
-        self.pandas_data.to_csv("traineedata.csv", index=False)
+        self.controller.cusomter_pd.to_csv("traineedata.csv", index=False)
         if not inhibit_success_msg:
             tk.messagebox.showinfo(message="Sucessfully made changes")
 
@@ -213,11 +211,6 @@ class CustomerData():
     def __init__(self, master_controller):
         self.cusomter_pd = pd.read_csv("traineedata.csv")
         self.cusomter_pd = self.cusomter_pd.fillna('') #replace empty fields (which would normally show NaN) with ""
-        # format the Date of Birth as a date
-        #self.cusomter_pd['DoB'] = pd.to_datetime(self.cusomter_pd['DoB'], dayfirst=True, errors='coerce')
-
-        #self.cusomter_pd['DoB'] = pd.to_datetime(self.cusomter_pd['DoB'], format="%d/%m/%Y")
-        #self.cusomter_pd['DoB'] = pd.to_datetime(self.cusomter_pd['DoB']).apply(lambda x: x.strftime('%d/%m/%Y')if not pd.isnull(x) else '')
 
         self.traineedata = {}
 
@@ -225,7 +218,7 @@ class CustomerData():
         # loop through each row/trainee in the datastructure
         while self.i < len(self.cusomter_pd):
             # create an object for each customer
-            trainee_obj = Trainee(master_controller, self.cusomter_pd, self.i)
+            trainee_obj = Trainee(master_controller, self, self.i)
             trainee_obj.read_trainee_object()
             self.traineedata[trainee_obj.ID]=trainee_obj
             self.i = self.i + 1

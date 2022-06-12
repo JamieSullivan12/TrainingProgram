@@ -3,6 +3,7 @@ from tkinter import ttk
 import UI_HomePage, UI_TraineePage, UI_AddCustomerpage, UI_TraineeInfoPage, UI_TrainingPlanViewerPage, UI_ModifyExercises
 import pandas as pd
 import Process_DataStructures
+import sys
 
 class Tracker:
     """ Toplevel windows resize event tracker. """
@@ -203,12 +204,18 @@ class GUI(ttk.Frame):
             self.scrollable_canvas.update_idletasks()
             self.scrollable_canvas.config(scrollregion=self.scrollable_frame.bbox())
             
+def destroyer():
+    root.quit()
+    root.destroy()
+    sys.exit()
+
 
 # only run the following code if it has been initialised by the user
 if __name__ == '__main__':
     # initialise tkinter object
     root = tk.Tk()
     root.withdraw()
+
     parent = tk.Toplevel(master=root)
     root.title("Training App")
     parent.geometry('900x600')
@@ -217,6 +224,9 @@ if __name__ == '__main__':
     # setup UI styling
     parent.tk.call("source", "sun-valley.tcl")
     parent.tk.call("set_theme", "light")
+
+    root.protocol("WM_DELETE_WINDOW", destroyer)
+    parent.protocol("WM_DELETE_WINDOW", destroyer)
 
     # initliase UI object (note GUI is a class above)
     gui = GUI(parent,tracker)

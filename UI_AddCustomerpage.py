@@ -7,7 +7,8 @@ import random
 
 class AddCustomerPage(ttk.Frame):
     def add_customer(self):
-        new_trainee_obj = Trainee(self.controller,self.controller.customerdata_obj.cusomter_pd, self.controller.customerdata_obj.get_current_index())
+
+        new_trainee_obj = Trainee(self.controller,self.controller.customerdata_obj, self.controller.customerdata_obj.get_current_index())
 
         name = self.name_entry.get()
         email = self.email_entry.get()

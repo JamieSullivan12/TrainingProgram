@@ -1,8 +1,17 @@
-version 1.3 
-- fixed issue where page was not refreshing upon adding a trainee
+Version 1.5
+- Issue when saving two or more new trainees or exercises
+
+Version 1.4
+- Fixed issue where page was not refreshing upon adding a trainee
+
+Version 1.3 
+- Removed console from executable
 
 Version 1.2
 - Fixed some issues with the UI and creating a training plan after adding an exercise
+
+Version 1.1
+- Add exercise page added. Fixed UI
 
 Version 1.0
 - Initial release
