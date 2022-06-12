@@ -39,6 +39,7 @@ class Data():
             self.descriptor=descriptor
             self.type=type
             self.categoryobj=categoryobj
+            self.category=categoryobj.ID
 
         def writetofile(self):
             #try:

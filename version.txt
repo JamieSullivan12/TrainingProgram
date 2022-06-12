@@ -1,2 +1,5 @@
+Version 1.2
+- Fixed some issues with the UI and creating a training plan after adding an exercise
+
 Version 1.0
 - Initial release

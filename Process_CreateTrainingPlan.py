@@ -2,9 +2,6 @@ import random
 import datetime
 from tokenize import Triple
 from tkinter import messagebox
-from typing import Set
-import json
-from numpy import number
 
 
 class TrainingPlan():
@@ -186,7 +183,6 @@ class TrainingPlan():
         self.timestamp = importstring["timestamp"]
         self.planned_date = importstring["planned_date"]
         for circuit in self.importstring["circuits"]:
-            print(circuit)
             self.circuits.append(self.Circuit(self, exercisedataset = self.master_controller.exercisedata_dict, import_data=circuit))
         self.export_to_string()
 

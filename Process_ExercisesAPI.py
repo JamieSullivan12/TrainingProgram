@@ -1,7 +1,5 @@
-from pickle import FALSE
 import requests
 import json
-from pprint import pprint
 
 class ExerciseCategories():
     def __init__(self, id, name):
@@ -46,29 +44,23 @@ def load_data():
 
 
 
-    print("loading categories")
     for category in categories_json["results"]:
         category_dict[category["id"]]=ExerciseCategories(category["id"],category["name"])
-
-    print(category_dict)
-    print("loading exercise database: ONLINE")
-    #f = open("exercises.json","w")
 
     
     count = 0
     exercises_json_list=[]
     for category_id in category_dict:
-        print("fdjgn")
+
         link = f"https://wger.de/api/v2/exercise/?category={category_id}&language=2"
         timeout = 0
         
         while link != None: #link becomes None when no more pages are available to be loaded
-            print("loading")
+
             #accessing API
             try:
                 exercises_response = requests.get(link, headers=headers)
-                #print(exercise_categories_response.status_code)
-                #print(exercises_response.content)
+
                 exercises_json = json.loads(exercises_response.content.decode('utf-8'))
                 exercises_json_list.append(exercises_json)
                 link=exercises_json["next"]
@@ -78,19 +70,10 @@ def load_data():
                     category_dict[category_id].add_exercise(exc)
                     excercises_objects[exercise["id"]]=exc
             except Exception as e:
-                print("I got here")
                 timeout += 1
             if timeout > 10: return excercises_objects
 
-        if count > 0: return excercises_objects
+        #if count > 0: return excercises_objects
         count += 1
 
-                
-
-
-    
-    for ex in excercises_objects:
-        print(excercises_objects[ex].name)
-    # writing the data to a local file so it can be used in the future
-    #json.dump(exercises_json_list,f)
     return excercises_objects
