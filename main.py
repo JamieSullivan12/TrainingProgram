@@ -218,6 +218,8 @@ if __name__ == '__main__':
 
     parent = tk.Toplevel(master=root)
     root.title("Training App")
+    parent.title("Training App")
+
     parent.geometry('900x600')
     tracker = Tracker(parent)
     tracker.bind_config()

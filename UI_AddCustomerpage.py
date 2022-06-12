@@ -52,5 +52,5 @@ class AddCustomerPage(ttk.Frame):
         i += 3
         
         # button links to page where a new customer can be created
-        add_customer = ttk.Button(self, text='Add Customer', command=lambda:self.add_customer())
+        add_customer = ttk.Button(self, text='Add Trainee', command=lambda:self.add_customer())
         add_customer.grid(row=i,column=0, padx=20, pady=10, sticky="w")

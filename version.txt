@@ -1,5 +1,6 @@
 Version 1.5
 - Issue when saving two or more new trainees or exercises
+- Root window name updated
 
 Version 1.4
 - Fixed issue where page was not refreshing upon adding a trainee
