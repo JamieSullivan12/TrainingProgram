@@ -48,15 +48,12 @@ def load_data():
         category_dict[category["id"]]=ExerciseCategories(category["id"],category["name"])
 
     
-    count = 0
+
     exercises_json_list=[]
     for category_id in category_dict:
-
         link = f"https://wger.de/api/v2/exercise/?category={category_id}&language=2"
         timeout = 0
-        
         while link != None: #link becomes None when no more pages are available to be loaded
-
             #accessing API
             try:
                 exercises_response = requests.get(link, headers=headers)
@@ -72,8 +69,5 @@ def load_data():
             except Exception as e:
                 timeout += 1
             if timeout > 10: return excercises_objects
-
-        #if count > 0: return excercises_objects
-        count += 1
 
     return excercises_objects

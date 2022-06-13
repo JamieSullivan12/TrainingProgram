@@ -58,7 +58,7 @@ class ModifyExercisesPage(ttk.Frame):
             
             if selection == "Make a selection":
                 tkinter.messagebox.showerror(message="Please make a selection")
-                self.new_exercise_click()
+                return
 
             type_names = []
             for type in self.master_controller.types:
@@ -74,7 +74,8 @@ class ModifyExercisesPage(ttk.Frame):
 
             if type_selection == "Make a selection":
                 tkinter.messagebox.showerror(message="Please make a selection")
-                self.new_exercise_click()
+                return
+
 
             self.selected_type = ""
             for type in self.master_controller.types:

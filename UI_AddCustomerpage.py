@@ -13,6 +13,10 @@ class AddCustomerPage(ttk.Frame):
         name = self.name_entry.get()
         email = self.email_entry.get()
 
+        if name == "" or email == "":
+            messagebox.showerror(message="Name or email are empty. Please make sure that they have a value before adding a trainee.")
+            return
+
         id = random.randint(0,999999)
         
         while id in self.controller.customerdata_dict:

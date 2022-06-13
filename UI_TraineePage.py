@@ -78,7 +78,7 @@ class CustomerPage(ttk.Frame):
                     self.controller.customer_df.at[customers[c].pandas_index,"DoB"]=customers[c].DoB
                     self.controller.customer_df.at[customers[c].pandas_index,"Goals"]=customers[c].goals
                     self.controller.customer_df.at[customers[c].pandas_index,"Email"]=customers[c].email
-                    save_log+=f"Customer: {customers[c].name} updated.\n"
+                    save_log+=f"Trainee: {customers[c].name} updated.\n"
 
         if save_log=="" and error_msg=="":
             tkinter.messagebox.showinfo(title="No changes were made", message="No changes were made")
@@ -115,14 +115,11 @@ class CustomerPage(ttk.Frame):
 
 
 
-    def set_heading(self):
-        self.controller.tkRoot.title("Training App > Customers")
-
     def __init__(self, controller):
         ttk.Frame.__init__(self, controller.frame_obj.scrollable_frame)
         self.controller = controller
 
-        title = ttk.Label(self, text="Customers")
+        title = ttk.Label(self, text="Trainee Search")
         title.grid(row=0,column=0, padx=(40,10), pady=(10,0), sticky="w")
 
 

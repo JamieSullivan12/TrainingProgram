@@ -130,6 +130,8 @@ class MoreInfoPage(ttk.Frame):
                 setter(entry.get())
             except Exception as e:
                 messagebox.showerror(message="Error occured:\n\n" + str(e))
+                cancel(label, entry, row, column, padx, pady, sticky)
+                return
             label["text"] = f"{prefix}{entry.get()}{suffix}"
             cancel(label, entry, row, column, padx, pady, sticky)
             

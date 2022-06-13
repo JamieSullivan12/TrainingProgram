@@ -50,7 +50,12 @@ class Data():
             self.controller.exercisefile.at[self.pandas_index,"Category"]=self.categoryobj.ID
 
             # write the object to a CSV
-            self.controller.exercisefile.to_csv("exercisedatabase.csv", index=False)
+            try:
+                self.controller.exercisefile.to_csv("exercisedatabase.csv", index=False)
+            except PermissionError as e:
+                tk.messagebox.showerror(message="Permission denied to save changes. Please make sure data files are not currently open on your desktop")
+                return
+
             tk.messagebox.showinfo(message="Sucessfully made changes")
 
 
@@ -176,7 +181,13 @@ class Trainee():
         self.controller.cusomter_pd.at[self.pandas_index,"TrainingPlans"]=json.dumps(training_plans_with_string)
 
         # write the object to a CSV
-        self.controller.cusomter_pd.to_csv("traineedata.csv", index=False)
+        try:
+            self.controller.cusomter_pd.to_csv("traineedata.csv", index=False)
+        except PermissionError as e:
+            tk.messagebox.showerror(message="Permission denied to save changes. Please make sure data files are not currently open on your desktop")
+            return
+
+            
         if not inhibit_success_msg:
             tk.messagebox.showinfo(message="Sucessfully made changes")
 

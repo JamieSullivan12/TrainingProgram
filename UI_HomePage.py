@@ -7,22 +7,25 @@ from tkinter import ttk
 class HomePage(ttk.Frame):
     """Controls the GUI for HomePage"""
     
-    def __init__(self, controller):
+    def __init__(self, toplevel):
+        # toplevel refers to the class in which the mainline algorithm occurs
+        self.toplevel = toplevel
+
         # inherit ttk.Frame class - that means that the HomePage class WILL BECOME also a ttk.Frame class
-        ttk.Frame.__init__(self, controller.frame_obj.scrollable_frame)
+        # self.toplevel.frame_obj.scrollable_frame refers to the frame on which this inherited frame will be placed
+        ttk.Frame.__init__(self, self.toplevel.frame_obj.scrollable_frame)
 
-        self.controller = controller
-
-        # place widgets on the screen (title & buttons)
-        header = ttk.Label(self,text="Training App")
-        header.grid(row=0,column=0,sticky="nw",padx=35,pady=(20,0))
+    
+        # Widgets
+        heading = ttk.Label(self,text="Training App")
+        heading.grid(row=0,column=0,sticky="nw",padx=35,pady=(20,0))
         
-        self.customers_button = ttk.Button(self,text="Trainee Search", width=30,command=lambda:self.controller.showwindow("CustomerPage"))
-        self.customers_button.grid(row=1,column=0, padx=(20,10),pady=10)
+        self.traineesearch_button = ttk.Button(self,text="Trainee Search", width=30,command=lambda:self.toplevel.showwindow("CustomerPage"))
+        self.traineesearch_button.grid(row=1,column=0, padx=(20,10),pady=10)
 
-        self.add_customer_button = ttk.Button(self,text="Add Trainee",width=30, command=lambda:self.controller.showwindow("AddCustomerPage"))
-        self.add_customer_button.grid(row=2,column=0, padx=(20,10),pady=10)
+        self.addtrainee_button = ttk.Button(self,text="Add Trainee",width=30, command=lambda:self.toplevel.showwindow("AddCustomerPage"))
+        self.addtrainee_button.grid(row=2,column=0, padx=(20,10),pady=10)
 
-        self.modify_exercises_button = ttk.Button(self,text="Add Exercise",width=30, command=lambda:self.controller.showwindow("ModifyExercisesPage"))
-        self.modify_exercises_button.grid(row=3,column=0, padx=(20,10),pady=10)
+        self.addexercise_button = ttk.Button(self,text="Add Exercise",width=30, command=lambda:self.toplevel.showwindow("ModifyExercisesPage"))
+        self.addexercise_button.grid(row=3,column=0, padx=(20,10),pady=10)
 
