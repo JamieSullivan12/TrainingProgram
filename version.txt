@@ -1,3 +1,6 @@
+Version 1.7
+- fixed headings and added edge case checking for zero inputs and for when a file is trying to be edited
+
 Version 1.6
 - Training plan would not save on a new trainee
 
