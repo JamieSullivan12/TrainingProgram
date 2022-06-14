@@ -1,91 +1,98 @@
 import tkinter as tk
 from tkinter import ttk
-
-import UI_HomePage, UI_TraineePage, UI_AddCustomerpage, UI_TraineeInfoPage, UI_TrainingPlanViewerPage, UI_ModifyExercises
-
-import pandas as pd
-import Process_DataStructures
 import sys
 
-class Tracker:
-    """ Toplevel windows resize event tracker. """
+import UI_HomePage, UI_TraineePage, UI_AddTraineePage, UI_TraineeInfoPage, UI_TrainingPlanViewerPage, UI_ModifyExercises
+import Process_DataStructures, scrollable_frame
 
-    def __init__(self, toplevel):
-        self.toplevel = toplevel
-        self.width, self.height = toplevel.winfo_width(), toplevel.winfo_height()
-        self._func_id = None
 
-    def bind_config(self):
-        self._func_id = self.toplevel.bind("<Configure>", self.resize)
+class GUI():
+
+    def setupmenubar(self):
+        """ Configure the navigation bar (menubar) """
         
-    def unbind_config(self):  # Untested.
-        if self._func_id:
-            self.toplevel.unbind("<Configure>", self._func_id)
-            self._func_id = None
+        # initialise menu bar object
+        self.menubar = tk.Menu(self.toplevel_frame)
 
-    def resize(self, event):
-        if(event.widget == self.toplevel and
-           (self.width != event.width or self.height != event.height)):
-            self.width, self.height = event.width, event.height
-            if hasattr(self,"scrollable_frame"):
-                self.scrollable_frame.update()
-        
-    def link_scrollable_frame(self,scrollable_frame):
-        self.scrollable_frame = scrollable_frame
-
-
-
-class GUI(ttk.Frame):
-    def __init__(self,parent,tracker):
-        self.parent=parent
-        self.tracker=tracker
-
-        # setup parent container and child frame which is horizontally and vertically scrollable
-        self.container = ttk.Frame(self.parent)
-        self.container.grid_rowconfigure(0,weight=1)
-        self.container.grid_columnconfigure(0,weight=1)
-        self.frame_obj = self.CreateScrollableFrame(self)
-        # function that tracks ALL clicks on the Tkinter window
-        self.tracker.link_scrollable_frame(self.frame_obj)
-
-
-        # initialising exercises data
-        self.data_obj = Process_DataStructures.Data()
-        self.exercisedata_dict = self.data_obj.exercisedata
-        # initialising category data
-        self.categorydata_dict = self.data_obj.categoriesdata
-        # initialising customer data
-        self.customerdata_obj = Process_DataStructures.CustomerData(self)
-        self.customerdata_dict = self.customerdata_obj.traineedata
-
-        # create all pages that the user can navigate to
-        self.setupwindows()
-        # only show the home page (initial page the user is greeted with)
-        self.showwindow("HomePage")
-
-        # configure the navigation menu/bar
-        self.menubar = tk.Menu(self.parent)
+        # create the "Settings" menu
         self.optionsmenu = tk.Menu(self.menubar, tearoff=False)
         self.optionsmenu.add_command(label="Change Theme", command=lambda:self.change_theme())
         self.menubar.add_cascade(label="Settings", menu=self.optionsmenu)
+
+        # create the "Navigate" menu
         self.navigate = tk.Menu(self.menubar, tearoff=False)
         self.navigate.add_command(label="Home", command=lambda:self.showwindow("HomePage"))
         self.navigate.add_command(label="Trainee Search", command=lambda:self.showwindow("CustomerPage"))
-        self.navigate.add_command(label="Add Trainee", command=lambda:self.showwindow("AddCustomerPage"))
+        self.navigate.add_command(label="Add Trainee", command=lambda:self.showwindow("AddTraineePage"))
         self.navigate.add_command(label="Add Exercise", command=lambda:self.showwindow("ModifyExercisesPage"))
-
         self.menubar.add_cascade(label="Navigate", menu=self.navigate)
-        self.parent.config(menu=self.menubar)
+
+        # place menu bar onto the toplevel_frame widget
+        self.toplevel_frame.config(menu=self.menubar)
+
+    def setupwindows(self):
+        '''
+        Initialise all GUI classes
+        '''
+        # when other GUI pages are initialised, they may begin trying to change the active page (using showwindow() method). this is prevented using the ignore_setup flag.
+        self.ignore_setup=True 
         
-        # types of exercise codes
-        self.types = {1:"reps",3:"time",5:"distance",6:"long distance"}
+        # store all GUI pages in a dictionary.
+        self.frames={}
 
+        # loop through all imported GUI objects (from other files)
+        pages = [UI_HomePage.HomePage,UI_TraineePage.CustomerPage,UI_AddTraineePage.AddTraineePage, UI_TraineeInfoPage.TraineeInfoPage,UI_TrainingPlanViewerPage.TrainingPlanReviewPage, UI_ModifyExercises.ModifyExercisesPage]
+        for page in pages:
+            # if page already has been initalised, remove it
+            if page.__name__ in self.frames:
+                self.frames[page.__name__].grid_forget()
+            # strore the name of the class (will be used as a key in the self.frames dict)
+            page_name = page.__name__
 
-        self.container.pack(side='top', fill='both', expand=True)
-    '''
-    Used to toggle between light mode and dark mode
-    '''
+            # initalise the GUI object. self is passed as the mainline_obj class. It allows all other GUI objects to access attributes and methods from this mainline class.
+            frame = page(self)
+
+            # for easy access, add the newly created object to a dictionary
+            self.frames[page_name] = frame
+           
+        self.ignore_setup=False
+
+    def resetwindows(self):
+        """
+        Reset the entire application - all windows will be removed, and then re-generated
+        """
+        # remove all windows
+        for frame in self.frames:
+            self.frames[frame].grid_forget()
+        # regenerate all windows
+        self.setupwindows()
+
+    def showwindow(self, frame_name):
+        '''
+        Show a requested GUI class to the user.
+        - frame_name is the name of that GUI class which needs to be shown
+        '''
+        # see setupwindows() method for description of self.ignore_setup
+        if not self.ignore_setup:
+
+            # remove ALL frames from the viewing window
+            for frame in self.frames:
+                self.frames[frame].grid_forget()
+            
+            # keep track of which frame is currently being shown to the user
+            self.current_frame = frame_name
+            self.current_frame_object = self.frames[frame_name]
+            
+            # place the requested frame on the window
+            self.current_frame_object.grid(row=0,column=0)
+            
+            # update ALL widget elements
+            self.scrollable_frame.update()
+
     def change_theme(self):
+        '''
+        Used to toggle between light mode and dark mode
+        '''
         # NOTE: The theme's real name is sun-valley-<mode>
         if root.tk.call("ttk::style", "theme", "use") == "sun-valley-dark":
             # Set light theme
@@ -94,148 +101,60 @@ class GUI(ttk.Frame):
             # Set dark theme
             root.tk.call("set_theme", "dark")
 
-    
-    '''
-    Initialise all GUI classes
-    '''
-    def setupwindows(self):
-        # when other GUI pages are initialised, they may begin trying to change the active page (using showwindow() method). this is prevented using the ignore_setup flag.
-        self.ignore_setup=True 
-        
-        # store all created frames (top level containers) in a dictionary.
-        # used when the user switches pages (requested frame brought to front)
-        self.frames={}
+    def __init__(self,toplevel_frame):
+        self.toplevel_frame=toplevel_frame
 
-        # loop through all imported GUI objects (from other files)
-        pages = [UI_HomePage.HomePage,UI_TraineePage.CustomerPage,UI_AddCustomerpage.AddCustomerPage, UI_TraineeInfoPage.MoreInfoPage,UI_TrainingPlanViewerPage.SessionPlanReviewPage, UI_ModifyExercises.ModifyExercisesPage]
-        for page in pages:
-            # if page already has been initalised, remove it
-            if page.__name__ in self.frames:
-                self.frames[page.__name__].grid_forget()
-            page_name = page.__name__
+        ########### INITIALISING DATASTRUCTURES ############
+        # initialising exercises data
+        self.data_obj = Process_DataStructures.Data()
+        self.exercisedata_dict = self.data_obj.exercisedata
+        # initialising category data
+        self.categorydata_dict = self.data_obj.categoriesdata
+        # initialising customer data
+        self.customerdata_obj = Process_DataStructures.CustomerData(self)
+        self.customerdata_dict = self.customerdata_obj.traineedata
+        # hard coding types of exercise codes. TODO: remove hard coding
+        self.exercise_formats = {1:"reps",3:"time",5:"distance",6:"long distance"}
 
-            # initalise the GUI object. self is passed as a "parent class"
-            frame = page(self)
-
-            # keep track of the initialised pages in a dict {page name: frame}
-            self.frames[page_name] = frame
-           
-        self.ignore_setup=False
-
-    def resetwindows(self):
-        for frame in self.frames:
-            self.frames[frame].grid_forget()
+        ########### INITIALISING GUI ############
+        # using developer-made generalised code to define a new frame with scrollbars
+        self.scrollable_frame = scrollable_frame.ScrollableFrame(self.toplevel_frame)
+        self.setupmenubar()
         self.setupwindows()
+        self.showwindow("HomePage") # Show top the HomePage frame
+   
 
-    '''
-    Will place a requested frame (passed as an argument) on the user's viewing window
-    - Note that all GUI objects must inherit the ttk.Frame class for this to work
-    '''
-    def showwindow(self, frame_name):
-        # see setupwindows() method for description of self.ignore_setup
-        if not self.ignore_setup:
-            # remove ALL frames from the viewing window
-            for frame in self.frames:
-                self.frames[frame].grid_forget()
-            # keep track of which frame is currently being shown to the user
-            self.current_frame = frame_name
-            self.current_frame_object = self.frames[frame_name]
-            # place the requested frame on the window
-            self.current_frame_object.grid(row=0,column=0)
-            # update ALL widget elements
-            self.frame_obj.update()
-
-
-
-
-    class CreateScrollableFrame(ttk.Frame):
-        '''
-        Class to create a frame which can be scrolled through (complicated structure using a tkinter canvas widget).
-        '''
-        def __init__(self,parent):
-            self.parent=parent
-
-            # inherit all attributes & methods from the ttk.Frame widget
-            super().__init__(self.parent.container)
-            
-            # create the canvas, vertical and horizontal scrollbar
-            self.scrollable_canvas = tk.Canvas(parent.container, bd=0, highlightthickness=0)
-            self.scrollbar = ttk.Scrollbar(self.parent.container, orient="vertical", command=self.scrollable_canvas.yview)
-            self.hscrollbar = ttk.Scrollbar(self.parent.container, orient="horizontal", command=self.scrollable_canvas.xview)
-            self.scrollable_frame = ttk.Frame(self.scrollable_canvas)
-            # place the frmae on the canvas
-            self.scrollable_canvas.create_window((0,0), window=self.scrollable_frame, anchor='nw')
-            # setup the scrolling actions
-            self.bind("<Configure>", lambda e: self.scrollable_canvas.configure(scrollregion = self.scrollable_canvas.bbox("all")))
-            self.scrollable_canvas.configure(yscrollcommand=self.scrollbar.set)
-            self.scrollable_canvas.configure(xscrollcommand=self.hscrollbar.set)
-            self.hscrollbar.grid(row=1, column=0, sticky="ew")
-            self.scrollbar.grid(row=0, column=1, sticky="ns")
-            self.scrollable_canvas.grid(row=0, column=0, sticky="nsew")
-            # bind mousewheel to scrolling action
-            self.bind_all("<MouseWheel>", self._on_mousewheel)
-            
-            self.update()
-
-        '''
-        Link scrolling of the mouse wheel to the scrollbar
-        - _bound_to_mousewheel: called whenever the pointer enters the canvas
-        - _unbound_to_mousewheel: called whenever the pointer leaves the canvas
-        - _on_mousewheel: called whenever the mousewheel scroll is detected (unless pointer is 
-            outside of canvas)
-        '''
-        def _bound_to_mousewheel(self, event):
-            self.scrollable_canvas.bind_all("<MouseWheel>", self._on_mousewheel)
-        def _unbound_to_mousewheel(self, event):   
-            self.scrollable_canvas.unbind_all("<MouseWheel>")
-        def _on_mousewheel(self, event):
-            if self.vscrollable:
-                self.scrollable_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-
-
-        def update(self):
-            """
-            Update the scrollwheels on the scrollable frame to match contents
-            """
-            self.parent.parent.update_idletasks()
-            if self.parent.container.winfo_height() >= self.scrollable_frame.winfo_height()+20:
-                self.vscrollable=False
-            else:
-                self.vscrollable=True
-
-            self.scrollable_canvas.update_idletasks()
-            self.scrollable_canvas.config(scrollregion=self.scrollable_frame.bbox())
-            
 def destroyer():
+    """ Handle program exit - will close all windows and command lines to prevent the program from remaining open in the background"""
     root.quit()
     root.destroy()
     sys.exit()
-
 
 # only run the following code if it has been initialised by the user
 if __name__ == '__main__':
     # initialise tkinter window
     root = tk.Tk()
     root.withdraw()
-    # inita
+
+    # initalising a parent TopLevel widget - is the top level frame which all other pages are placed on
     parent = tk.Toplevel(master=root)
+    parent.grid_rowconfigure(0,weight=1)
+    parent.grid_columnconfigure(0,weight=1)
     parent.title("Training App")
     parent.geometry('900x600')
-    # track user interrupts on the UI
-    tracker = Tracker(parent)
-    tracker.bind_config()
+
     # setup UI styling
     parent.tk.call("source", "sun-valley.tcl")
     parent.tk.call("set_theme", "light")
 
-    
+    # handle program exit protocol
     root.protocol("WM_DELETE_WINDOW", destroyer)
     parent.protocol("WM_DELETE_WINDOW", destroyer)
 
     # initliase UI object (note GUI is a class above)
-    gui = GUI(parent,tracker)
+    gui = GUI(parent)
 
-    # continually loop to listen for events
+    # continually loop to listen for event interrupts
     parent.mainloop()
 
-    
+

@@ -1,5 +1,6 @@
 import requests
 import json
+import tkinter as tk
 
 class ExerciseCategories():
     def __init__(self, id, name):
@@ -14,12 +15,10 @@ class ExerciseCategories():
         self.exercises.append(exercise_obj)
 
 class ExercisesAPI():
-    def __init__(self,id,name,description,category,equiptment):
+    def __init__(self,id,name,description):
         self.id=id
         self.name=name
         self.description=description
-        self.category=category
-        self.equiptment=equiptment
 
 
 def load_data():
@@ -38,7 +37,7 @@ def load_data():
             cont = True
             #json.dump(categories_json, category_file)
             #category_file.close()
-        except Exception as e:
+        except requests.exceptions.RequestException as e:
             timeout += 1
             if timeout > 10: return excercises_objects
 
@@ -47,27 +46,38 @@ def load_data():
     for category in categories_json["results"]:
         category_dict[category["id"]]=ExerciseCategories(category["id"],category["name"])
 
-    
 
-    exercises_json_list=[]
     for category_id in category_dict:
+
+        # link to retrieve the exercises for a specific category, category_id
         link = f"https://wger.de/api/v2/exercise/?category={category_id}&language=2"
         timeout = 0
-        while link != None: #link becomes None when no more pages are available to be loaded
-            #accessing API
-            try:
-                exercises_response = requests.get(link, headers=headers)
 
+        # link refers to the fetch link for the API. Seen as the database is so large, exercises are loaded in seperate "pages". In each page's data, it has a field "next" which links to the following page with exercises. This loop will continue to request exercises from all pages, until link becomes None (meanin the end case has been reached)
+        while link != None: 
+            try:
+                #accessing API
+                exercises_response = requests.get(link, headers=headers)
                 exercises_json = json.loads(exercises_response.content.decode('utf-8'))
-                exercises_json_list.append(exercises_json)
-                link=exercises_json["next"]
-                # converting data into a class
+
+                # inserting the data retrieved for each exercise into an object
                 for exercise in exercises_json["results"]:
-                    exc = ExercisesAPI(exercise["id"],exercise["name"],exercise["description"],category_dict[exercise["category"]],exercise["equipment"])
-                    category_dict[category_id].add_exercise(exc)
-                    excercises_objects[exercise["id"]]=exc
-            except Exception as e:
+                    exercise_obj = ExercisesAPI(exercise["id"],exercise["name"],exercise["description"])
+                    # store the exercise object in a dictionary
+                    excercises_objects[exercise["id"]]=exercise_obj
+                
+                # retrieve the next page to be loaded in the API
+                link=exercises_json["next"]
+
+            except requests.exceptions.RequestException as e:
+                # try-catch will catch any errors thrown by the "requests" module. Note: this is done through the requests.exceptions.RequestException error which is the superclass for all requests errors (connection error/invalid response). Timeout will increment which means that a certain allowance will exist of any connection breaks before exiting the process
                 timeout += 1
-            if timeout > 10: return excercises_objects
+                
+            except Exception as e:
+                tk.messagebox.showerror(message="Invalid response from the API \n\n" + str(e))
+
+            if timeout > 10: 
+                return excercises_objects
+
 
     return excercises_objects

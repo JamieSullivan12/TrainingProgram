@@ -62,21 +62,18 @@ class Data():
     class CategoryData():
         """Holds attributes for a Category (e.g., upper body push). 
         The constructor requires:
-        - Category pandas data structure
-        - Index of the row which is being constructed"""
+        - pandas_data: pandas data structure with raw data
+        - Index of the row/category which is being constructed in this object"""
         def __init__(self,pandas_data, pandas_index):
             self.pandas_data=pandas_data
             self.pandas_index=pandas_index
-            
             self.ID = self.pandas_data.at[self.pandas_index, "ID"]
             self.category = self.pandas_data.at[pandas_index,"Category"]
             self.exerciseobjects={}
         
         def linkexercisedata(self, exercise_data_object):
-            """Adds a link to en ExerciseData object to this CategoryData object. 
-            Note that [CategoryData] 1 -> 0..* [ExerciseData] meaning that every time
-            an ExerciseData object is instantiated, this function will be called to
-            add that exercise to the dictionary of exercises self.exerciseobjects()"""
+            """Method built into the CategoryData object. When an ExerciseData object is generated, it needs to be linked to it's respective CategoryData object (relationship in UML). This CategoryData object contains an array of ExerciseData objects which have a relationship with each category.
+            This FUNCTION takes an exercise_data_object and adds it to the dictionary of objects within this CategoryData class."""
             self.exerciseobjects[exercise_data_object.ID] = exercise_data_object
 
     def __init__(self):
@@ -111,47 +108,56 @@ class Data():
 
 
 class Trainee():
-    """Initialise a Trainee object.
-        - pandas_index = CSV row which is being read"""
-    
+
     def read_trainee_object(self):
-
-
+        """
+        Injects data from the Pandas DataFrame into this Trainee object
+        """
+        # initialise ID, name and DoB and email. These fields are all strings so can be directly brought over from the Pandas DataFrame
         self.ID = self.controller.cusomter_pd.at[self.pandas_index, "ID"]
         self.name = self.controller.cusomter_pd.at[self.pandas_index, "Name"]
         self.DoB = self.controller.cusomter_pd.at[self.pandas_index, "DoB"]
-        
-        
         self.email = self.controller.cusomter_pd.at[self.pandas_index, "Email"]
-
+        
+        # initialise the ability level, which must be converted to a float
         self.ability_level = self.controller.cusomter_pd.at[self.pandas_index, "AbilityLevel"]
         if str(self.ability_level) == "": self.ability_level = 1 # set default AbilityLevel if non-existent
-
+        
+        # initialise the training plans for the Trainee. 
+        # the following code will convert the string representation (JSON) of a TrainingPlan into a range of TrainingPlan objects which will be instantiated
         self.training_plans_string = self.controller.cusomter_pd.at[self.pandas_index, "TrainingPlans"]
-
         self.training_plans = []
         # read the JSON (TrainingPlans) into a list-dictionary datastructure in Python
         if self.training_plans_string != "":
             training_plans_with_string = json.loads(self.training_plans_string)     
             for training_plan in training_plans_with_string:
-                training_plan_obj = TrainingPlan(self.master_controller, self)
+                training_plan_obj = TrainingPlan(self.mainline_obj, self)
                 training_plan_obj.import_from_string(training_plan)
                 self.training_plans.append(training_plan_obj)
-
+        
+        # initialise the goals field. This needs to be converted from a string representatio of an array to an actual Python array
         self.goals_string = self.controller.cusomter_pd.at[self.pandas_index, "Goals"]
-        # read the JSON (Goals) which are a currently a list representation in a string into a python list
         if self.goals_string != "":self.goals = json.loads(self.goals_string)
         else:self.goals=[] # default to an empty list
 
-
-    def __init__(self, master_controller, controller, pandas_index):   
+    def __init__(self, mainline_obj, controller, pandas_index): 
+        """
+        Constructs the Trainee class
+        - mainline_obj: the object for the top level class which contains all the datastructures and top level GUI control
+        - controller: the parent class (contains attributes like the Pandas DataFrame which need to be accessed within this function)
+        - pandas_index: the row (index) of the Trainee being instantiated within this class (used when accesing Trainee from Pandas DataFrame)
+        """  
+        self.mainline_obj=mainline_obj
         self.pandas_index=pandas_index
         self.controller=controller
-        self.master_controller=master_controller
-
 
     def create_trainee_object(self,id, name, email):
-        
+        """
+        Injects the data for the Trainee into this object
+        - id: the unique Trainee identifier
+        - name: the name of the Trainee
+        - email: the email of the Trainee
+        """
         self.ID=id
         self.name=name
         self.email=email
@@ -219,21 +225,21 @@ def format_date(date):
 
 class CustomerData():
     
-    def __init__(self, master_controller):
+    def __init__(self, mainline_obj):
         self.cusomter_pd = pd.read_csv("traineedata.csv")
-        self.cusomter_pd = self.cusomter_pd.fillna('') #replace empty fields (which would normally show NaN) with ""
-
+        self.cusomter_pd = self.cusomter_pd.fillna('')
         self.traineedata = {}
 
         self.i=0
         # loop through each row/trainee in the datastructure
         while self.i < len(self.cusomter_pd):
-            # create an object for each customer
-            trainee_obj = Trainee(master_controller, self, self.i)
+            # create an object for each Trainee
+            trainee_obj = Trainee(mainline_obj, self, self.i)
             trainee_obj.read_trainee_object()
             self.traineedata[trainee_obj.ID]=trainee_obj
             self.i = self.i + 1
     
+
     def get_current_index(self):
         self.i = self.i + 1
         return (self.i - 1)

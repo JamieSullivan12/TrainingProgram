@@ -2,7 +2,7 @@ from email import message
 from tkinter import ttk
 import tkinter as tk
 from tkinter import messagebox
-class SessionPlanReviewPage(ttk.Frame):
+class TrainingPlanReviewPage(ttk.Frame):
 
     class ListCircuit():
         """
@@ -164,8 +164,6 @@ class SessionPlanReviewPage(ttk.Frame):
                     self.info_label["text"] = f"{new_text}"
                     self.infocancelrequest()
 
-
-
     def savedata(self):
         """
         Calls a function in the customer object which applies the new JSON to secondary memory
@@ -199,7 +197,7 @@ class SessionPlanReviewPage(ttk.Frame):
         reuseable_datepopup.dateselect("Select Date", self.completedatechange)
 
     def __init__(self, controller):
-        ttk.Frame.__init__(self, controller.frame_obj.scrollable_frame)
+        ttk.Frame.__init__(self, controller.scrollable_frame)
 
         self.controller = controller
 
