@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-import sys
+import sys, traceback
 
 import UI_HomePage, UI_TraineePage, UI_AddTraineePage, UI_TraineeInfoPage, UI_TrainingPlanViewerPage, UI_ModifyExercises
 import Process_DataStructures, scrollable_frame
@@ -151,8 +151,18 @@ if __name__ == '__main__':
     root.protocol("WM_DELETE_WINDOW", destroyer)
     parent.protocol("WM_DELETE_WINDOW", destroyer)
 
-    # initliase UI object (note GUI is a class above)
-    gui = GUI(parent)
+    try:
+        # initliase UI object (note GUI is a class above)
+        gui = GUI(parent)
+    except Exception as e:
+        import datetime
+        with open("log.txt","a") as f:
+            f.write("\n\n\n\n####################")
+            f.write(str(datetime.datetime.now()))
+            f.write("####################\n\n")
+            f.write(traceback.format_exc())
+            
+        tk.messagebox.showerror(message="An error ocurred. Please see details below. Note that a more detailed account can be found in log.txt within the source code directory:\n\n" + str(e))
 
     # continually loop to listen for event interrupts
     parent.mainloop()
