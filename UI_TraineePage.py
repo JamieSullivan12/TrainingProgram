@@ -69,7 +69,7 @@ class CustomerPage(ttk.Frame):
 
         # remove all current Trainee rows on screen (they will be replaced during the search algorithm)
         for row in self.listofrows:
-            row.customer_frame.grid_forget()
+            row.grid_forget()
         self.listofrows=[]
         
         row_num=2 # value which records the row on which each Trainee is printed on the UI. Starts on 2 to avoid the already-placed elements on the GUI

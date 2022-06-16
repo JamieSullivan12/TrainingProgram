@@ -1,5 +1,6 @@
 Version 1.8
 - added a catch and logger for all errors
+- (patch1) fixed the broken trainee search function
 
 Version 1.7
 - fixed headings and added edge case checking for zero inputs and for when a file is trying to be edited
