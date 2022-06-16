@@ -59,7 +59,7 @@ class TrainingPlan():
                 changelength = import_data["Length"]
 
             else:
-                # check if there are enough exercises left in the database to fill the requested number of circuits/supersets/sets.
+                # check if there are enough exercises left in the database to fill the requested number of circuits/stations/sets.
                 if len(exercisedataset) <= parent_controller.total_number_of_exercises:
                     parent_controller.not_enough_exercises_error = True
                     return
@@ -93,9 +93,9 @@ class TrainingPlan():
             if str(self.otherlength) != "0": return self.otherlength
             return None
 
-    class Superset():
+    class Station():
         def __init__(self, parent_controller, exercisedataset, import_data = ""):
-            # store an aggregation of sets within each superset object
+            # store an aggregation of sets within each station object
             self.sets = []
 
             if import_data == "":
@@ -111,26 +111,27 @@ class TrainingPlan():
 
     class Circuit():
         def __init__(self, parent_controller, exercisedataset, import_data = ""):
-            # store the aggregation of supersets for each circuit object
-            self.supersets = []
+            # store the aggregation of stations for each circuit object
+            self.stations = []
 
-            # if there is no import data, a training plan needs to be GENERATED (instantiating the Superset class)
+            # if there is no import data, a training plan needs to be GENERATED (instantiating the Station class)
             if import_data == "":
                 count = 0
-                while count < parent_controller.number_of_supersets:
-                    self.supersets.append(parent_controller.Superset(parent_controller, exercisedataset))
+                while count < parent_controller.number_of_stations:
+                    self.stations.append(parent_controller.Station(parent_controller, exercisedataset))
                     count = count + 1
 
 
             else:
-                for superset in import_data["supersets"]:
-                    self.supersets.append(parent_controller.Superset(parent_controller, exercisedataset, import_data=superset))
+                print(import_data)
+                for station in import_data["stations"]:
+                    self.stations.append(parent_controller.Station(parent_controller, exercisedataset, import_data=station))
             
 
-    def generate_training_plan(self, number_of_sets, number_of_supersets, number_of_circuits,):
+    def generate_training_plan(self, number_of_sets, number_of_stations, number_of_circuits,):
 
         self.number_of_sets = number_of_sets
-        self.number_of_supersets = number_of_supersets
+        self.number_of_stations = number_of_stations
         self.number_of_circuits = number_of_circuits
 
         self.total_number_of_exercises = 0
@@ -163,12 +164,12 @@ class TrainingPlan():
 
 
         for circ_count, circuit in enumerate(self.circuits):
-            self.exportstring["circuits"].append({"supersets":[]})
-            for super_count, superset in enumerate(circuit.supersets):
-                self.exportstring["circuits"][circ_count]["supersets"].append({"sets":[]})
-                for set_count, set in enumerate(superset.sets):
-                    self.exportstring["circuits"][circ_count]["supersets"][super_count]["sets"].append({})
-                    self.exportstring["circuits"][circ_count]["supersets"][super_count]["sets"][set_count] = {
+            self.exportstring["circuits"].append({"stations":[]})
+            for super_count, station in enumerate(circuit.stations):
+                self.exportstring["circuits"][circ_count]["stations"].append({"sets":[]})
+                for set_count, set in enumerate(station.sets):
+                    self.exportstring["circuits"][circ_count]["stations"][super_count]["sets"].append({})
+                    self.exportstring["circuits"][circ_count]["stations"][super_count]["sets"][set_count] = {
                         "ID": str(set.exercise_obj.ID),
                         "Length": str(set.getexerciselength()),
                         "OverrideName": str(set.overridename),

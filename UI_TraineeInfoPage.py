@@ -13,7 +13,7 @@ class TraineeInfoPage(ttk.Frame):
             """
             When a user requests to see more information about a training plan
             """
-            self.page_controller.mainline_obj.frames["TrainingPlanReviewPage"].injectdata(self.training_plan, self.page_controller.customer)
+            self.page_controller.mainline_obj.frames["TrainingPlanReviewPage"].injectdata(self.trainingplan_obj, self.page_controller.trainee)
             self.page_controller.mainline_obj.showwindow("TrainingPlanReviewPage")
 
         def __init__(self,page_controller, trainingplan_obj, row):
@@ -27,7 +27,7 @@ class TraineeInfoPage(ttk.Frame):
             self.trainingplan_obj = trainingplan_obj
 
             # instantiate a new frame object (placing it on the top-level scrollable_frame and extend it to this class)
-            ttk.Frame.__init__(self, self.page_controller)
+            ttk.Frame.__init__(self, self.page_controller.session_frame)
 
             # setting up the widgets of the row
             self.heading=ttk.Label(self,text=f"Training Plan Generated: {self.trainingplan_obj  .timestamp}")
@@ -97,7 +97,7 @@ class TraineeInfoPage(ttk.Frame):
         # create a new training plan obejct
         training_plan_obj = Process_CreateTrainingPlan.TrainingPlan(self.mainline_obj, self.trainee, self.planned_date)
         # call the method within that object to create the training plan
-        training_plan_obj.generate_training_plan(number_of_circuits=self.number_of_circuits, number_of_supersets=self.number_of_supersets, number_of_sets=self.number_of_sets)
+        training_plan_obj.generate_training_plan(number_of_circuits=self.number_of_circuits, number_of_stations=self.number_of_stations, number_of_sets=self.number_of_sets)
         # if an error occurs, then ignore the following
         if training_plan_obj.not_enough_exercises_error == False:
             # show the detailed page of the newly generated training plan
@@ -123,14 +123,14 @@ class TraineeInfoPage(ttk.Frame):
             self.number_of_circuits = int(self.no_circuits_SCALE.get())
         except Exception as e: pass
 
-    def changesupersetsvalue(self,*args):
+    def changestationsvalue(self,*args):
         """
-        Function which handles the scrollbar for the superset selector changing
-        - will update the text indicator next to the supersets scrollbar to show the value on which the slider is.
+        Function which handles the scrollbar for the station selector changing
+        - will update the text indicator next to the station scrollbar to show the value on which the slider is.
         """
         try:
-            self.no_supersets_VALUE["text"] = int(self.no_supersets_SCALE.get())
-            self.number_of_supersets = int(self.no_supersets_SCALE.get())
+            self.no_stations_VALUE["text"] = int(self.no_stations_SCALE.get())
+            self.number_of_stations = int(self.no_stations_SCALE.get())
         except Exception as e: pass
 
     def changesetsvalue(self,*args):
@@ -259,8 +259,8 @@ class TraineeInfoPage(ttk.Frame):
 
         ### CREATING THE CREATE TRAINING PLAN WINDOW - has three scrollers:
         ### - Circuits: control the amount of circuits which will exist in the generated session
-        ### - Supersets: control the number of supersets will exist in each circuit
-        ### - Sets: control the number of sets will exist in each superset
+        ### - Stations: control the number of stations will exist in each circuit
+        ### - Sets: control the number of sets will exist in each station
   
         # creating the circuits label (appears to the left of the scale widget)
         self.no_circuits_LABEL = ttk.Label(self.create_training_plan_frame, text="Circuits")
@@ -274,20 +274,20 @@ class TraineeInfoPage(ttk.Frame):
         self.no_circuits_VALUE.grid(row=0,column=2,sticky="w",padx=(0,15))
         self.number_of_circuits = int(self.no_circuits_SCALE.get())
 
-        # creating a widget for the number of supersets (structure same as that for circuits)
-        self.no_supersets_LABEL = ttk.Label(self.create_training_plan_frame, text="Supersets")
-        self.no_supersets_LABEL.grid(row=1,column=0,sticky="w",padx=(15,0))
-        self.no_supersets_SCALE = ttk.Scale(self.create_training_plan_frame, from_=2,to=8, command=self.changesupersetsvalue)
-        self.no_supersets_SCALE.set(3)
-        self.no_supersets_SCALE.grid(row=1,column=1,padx=(10,10),pady=10)
-        self.no_supersets_VALUE = ttk.Label(self.create_training_plan_frame, text=int(self.no_supersets_SCALE.get()))
-        self.no_supersets_VALUE.grid(row=1,column=2,sticky="w",padx=(0,15))
-        self.number_of_supersets = int(self.no_supersets_SCALE.get())
+        # creating a widget for the number of stations (structure same as that for circuits)
+        self.no_stations_LABEL = ttk.Label(self.create_training_plan_frame, text="Stations")
+        self.no_stations_LABEL.grid(row=1,column=0,sticky="w",padx=(15,0))
+        self.no_stations_SCALE = ttk.Scale(self.create_training_plan_frame, from_=1,to=8, command=self.changestationsvalue)
+        self.no_stations_SCALE.set(3)
+        self.no_stations_SCALE.grid(row=1,column=1,padx=(10,10),pady=10)
+        self.no_stations_VALUE = ttk.Label(self.create_training_plan_frame, text=int(self.no_stations_SCALE.get()))
+        self.no_stations_VALUE.grid(row=1,column=2,sticky="w",padx=(0,15))
+        self.number_of_stations = int(self.no_stations_SCALE.get())
 
-        # creating a widget for the numebr of sets (structure same as that for circuits)
+        # creating a widget for the number of sets (structure same as that for circuits)
         self.no_sets_LABEL = ttk.Label(self.create_training_plan_frame, text="Sets")
         self.no_sets_LABEL.grid(row=2,column=0,sticky="w",padx=(15,0))
-        self.no_sets_SCALE = ttk.Scale(self.create_training_plan_frame, from_=2,to=8,command=self.changesetsvalue)
+        self.no_sets_SCALE = ttk.Scale(self.create_training_plan_frame, from_=1,to=8,command=self.changesetsvalue)
         self.no_sets_SCALE.set(4)
         self.no_sets_SCALE.grid(row=2,column=1,padx=(10,10),pady=10)
         self.no_sets_VALUE = ttk.Label(self.create_training_plan_frame, text=int(self.no_sets_SCALE.get()))

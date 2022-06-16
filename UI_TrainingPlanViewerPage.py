@@ -14,23 +14,23 @@ class TrainingPlanReviewPage(ttk.Frame):
             self.circuit_frame.grid(row=0,column=column,padx=15,pady=15)
 
 
-            for superset_index, superset_obj in enumerate(circuit_obj.supersets):
-                self.ListSupersets(self.circuit_frame,superset_obj, superset_index)
+            for station_index, station_obj in enumerate(circuit_obj.stations):
+                self.ListStations(self.circuit_frame,station_obj, station_index)
 
         
 
-        class ListSupersets():
+        class ListStations():
             """
-            Will list all of the supersets inside of a circuit frame
+            Will list all of the stations inside of a circuit frame
             """
-            def __init__(self,circuit_frame,superset_obj,superset_index):
+            def __init__(self,circuit_frame,station_obj,station_index):
                 
-                self.superset_frame=ttk.LabelFrame(circuit_frame,text=f"Superset {superset_index+1}")
-                self.superset_frame.grid(row=superset_index,column=0,padx=10,pady=(15,0),sticky="ew")
+                self.station_frame=ttk.LabelFrame(circuit_frame,text=f"Station {station_index+1}")
+                self.station_frame.grid(row=station_index,column=0,padx=10,pady=(15,0),sticky="ew")
 
 
-                for set_index,set_obj in enumerate(superset_obj.sets):
-                    self.ListExercises(self.superset_frame,set_obj,set_index)
+                for set_index,set_obj in enumerate(station_obj.sets):
+                    self.ListExercises(self.station_frame,set_obj,set_index)
 
 
             class ListExercises():
@@ -49,10 +49,10 @@ class TrainingPlanReviewPage(ttk.Frame):
                         child.bind(sequence, func)
                 
 
-                def __init__(self, superset_frame, set_obj, set_index):
+                def __init__(self, station_frame, set_obj, set_index):
                     self.set_index = set_index
                     # container frame for an individual set
-                    self.set_frame = ttk.Frame(superset_frame)
+                    self.set_frame = ttk.Frame(station_frame)
                     self.set_obj=set_obj
                     self.setname = ""
                     self.setlength = ""

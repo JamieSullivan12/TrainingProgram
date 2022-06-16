@@ -23,13 +23,13 @@ def createsessionplanPDF(trainingplan, customer_name, directory):
         pdf.cell(40,10,"", ln=True) # empty line
         pdf.cell(40,10,f"Circuit {circ_count+1}", ln=True) # circuit heading
         
-        # loop through supersets
-        for sup_count, superset in enumerate(circuit.supersets):
+        # loop through stations
+        for sup_count, station in enumerate(circuit.stations):
             pdf.set_font("helvetica", "U", 13) # underlined
-            pdf.cell(40,10,f"Superset {sup_count+1}", ln=True) # superset heading
+            pdf.cell(40,10,f"Station {sup_count+1}", ln=True) # station heading
 
             # loop through sets
-            for set_count,set in enumerate(superset.sets):
+            for set_count,set in enumerate(station.sets):
                 pdf.set_font("helvetica", "", 13)
                 
                 # differentiating between reps, time or distance-based exercises (this information will be added to the PDF)
