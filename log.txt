@@ -1,0 +1,196 @@
+
+
+
+
+####################2022-06-19 15:41:27.694095####################
+
+Traceback (most recent call last):
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 156, in <module>
+    gui = GUI(parent)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 109, in __init__
+    self.data_obj = Process_DataStructures.Data()
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_DataStructures.py", line 106, in __init__
+    categorydata_obj = self.__categoryData(self.categoriesfile, i)
+AttributeError: 'Data' object has no attribute '_Data__categoryData'
+
+
+
+
+####################2022-06-19 15:43:04.688680####################
+
+Traceback (most recent call last):
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 156, in <module>
+    gui = GUI(parent)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 109, in __init__
+    self.data_obj = Process_DataStructures.Data()
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_DataStructures.py", line 119, in __init__
+    categorydata_obj = self.__categoryData(self.categoriesfile, i)
+AttributeError: 'Data' object has no attribute '_Data__categoryData'
+
+
+
+
+####################2022-06-19 15:52:35.845866####################
+
+Traceback (most recent call last):
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 156, in <module>
+    gui = GUI(parent)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 114, in __init__
+    self.customerdata_obj = Process_DataStructures.CustomerData(self)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_DataStructures.py", line 270, in __init__
+    self.traineedata[trainee_obj.ID]=trainee_obj
+AttributeError: 'Trainee' object has no attribute 'ID'
+
+
+
+
+####################2022-06-19 16:17:55.801547####################
+
+Traceback (most recent call last):
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 156, in <module>
+    gui = GUI(parent)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 114, in __init__
+    self.customerdata_obj = Process_DataStructures.CustomerData(self)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_DataStructures.py", line 299, in __init__
+    trainee_obj.read_trainee_object()
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_DataStructures.py", line 168, in read_trainee_object
+    training_plan_obj.import_from_string(training_plan)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 177, in import_from_string
+    self.circuits.append(self.Circuit(self, exercisedataset = self.master_controller.exercisedata_dict, import_data=circuit))
+TypeError: TrainingPlan.Circuit.__init__() got an unexpected keyword argument 'exercisedataset'
+
+
+
+
+####################2022-06-19 16:28:24.480672####################
+
+Traceback (most recent call last):
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 156, in <module>
+    gui = GUI(parent)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 114, in __init__
+    self.customerdata_obj = Process_DataStructures.CustomerData(self)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_DataStructures.py", line 299, in __init__
+    trainee_obj.read_trainee_object()
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_DataStructures.py", line 168, in read_trainee_object
+    training_plan_obj.import_from_string(training_plan)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 188, in import_from_string
+    self.__circuits.append(self.Circuit(self, import_data=circuit))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 115, in __init__
+    self.stations.append(parent_controller.Station(parent_controller, import_data=station))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 99, in __init__
+    self.sets.append(parent_controller.Set(parent_controller, import_data=set))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 48, in __init__
+    for exercise_id in self.parent_controller.master_controller.exercisedata_dict:
+AttributeError: 'TrainingPlan' object has no attribute 'master_controller'
+
+
+
+
+####################2022-06-19 16:29:31.179369####################
+
+Traceback (most recent call last):
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 156, in <module>
+    gui = GUI(parent)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 114, in __init__
+    self.customerdata_obj = Process_DataStructures.CustomerData(self)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_DataStructures.py", line 299, in __init__
+    trainee_obj.read_trainee_object()
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_DataStructures.py", line 168, in read_trainee_object
+    training_plan_obj.import_from_string(training_plan)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 192, in import_from_string
+    self.__circuits.append(self.Circuit(self, import_data=circuit))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 115, in __init__
+    self.stations.append(parent_controller.Station(parent_controller, import_data=station))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 99, in __init__
+    self.sets.append(parent_controller.Set(parent_controller, import_data=set))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 48, in __init__
+    for exercise_id in self.parent_controllerself.mainline_obj.exercisedata_dict:
+AttributeError: 'Set' object has no attribute 'parent_controllerself'
+
+
+
+
+####################2022-06-19 16:30:23.084412####################
+
+Traceback (most recent call last):
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 156, in <module>
+    gui = GUI(parent)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 114, in __init__
+    self.customerdata_obj = Process_DataStructures.CustomerData(self)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_DataStructures.py", line 299, in __init__
+    trainee_obj.read_trainee_object()
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_DataStructures.py", line 168, in read_trainee_object
+    training_plan_obj.import_from_string(training_plan)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 192, in import_from_string
+    self.__circuits.append(self.Circuit(self, import_data=circuit))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 115, in __init__
+    self.stations.append(parent_controller.Station(parent_controller, import_data=station))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 99, in __init__
+    self.sets.append(parent_controller.Set(parent_controller, import_data=set))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 71, in __init__
+    self.length=str(self.round(10*self.parent_controller.traineeobj.ability_level,base=5))
+AttributeError: 'TrainingPlan' object has no attribute 'traineeobj'
+
+
+
+
+####################2022-06-19 16:31:12.785432####################
+
+Traceback (most recent call last):
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 156, in <module>
+    gui = GUI(parent)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 114, in __init__
+    self.customerdata_obj = Process_DataStructures.CustomerData(self)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_DataStructures.py", line 299, in __init__
+    trainee_obj.read_trainee_object()
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_DataStructures.py", line 168, in read_trainee_object
+    training_plan_obj.import_from_string(training_plan)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 196, in import_from_string
+    self.__circuits.append(self.Circuit(self, import_data=circuit))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 115, in __init__
+    self.stations.append(parent_controller.Station(parent_controller, import_data=station))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 99, in __init__
+    self.sets.append(parent_controller.Set(parent_controller, import_data=set))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 71, in __init__
+    self.length=str(self.round(10*self.parent_controller.traineeobj.ability_level,base=5))
+AttributeError: 'TrainingPlan' object has no attribute 'traineeobj'
+
+
+
+
+####################2022-06-19 16:45:26.548774####################
+
+Traceback (most recent call last):
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 156, in <module>
+    gui = GUI(parent)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 114, in __init__
+    self.customerdata_obj = Process_DataStructures.CustomerData(self)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_DataStructures.py", line 312, in __init__
+    trainee_obj.read_trainee_object()
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_DataStructures.py", line 169, in read_trainee_object
+    training_plan_obj.import_from_string(training_plan)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 174, in import_from_string
+    self.__circuits.append(self.Circuit(self, import_data=circuit))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 113, in __init__
+    self.stations.append(parent_controller.Station(parent_controller, import_data=station))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 97, in __init__
+    self.sets.append(parent_controller.Set(parent_controller, import_data=set))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 69, in __init__
+    self.length=str(self.round(10*self.parent_controller.traineeobj.ability_level,base=5))
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\Process_CreateTrainingPlan.py", line 18, in round
+    return base * round(x/base)
+TypeError: unsupported operand type(s) for /: 'str' and 'int'
+
+
+
+
+####################2022-06-19 19:58:30.439215####################
+
+Traceback (most recent call last):
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 155, in <module>
+    gui = GUI(parent)
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 123, in __init__
+    self.showwindow("HomePage") # Show top the HomePage frame
+  File "C:\Users\jamie\Code\computerscienceIA-trainingprogram\main.py", line 78, in showwindow
+    self.current_frame_object.grid_forget()
+AttributeError: 'GUI' object has no attribute 'current_frame_object'

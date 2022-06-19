@@ -50,7 +50,7 @@ class ScrollableFrame(ttk.Frame):
         if self.vscrollable:
             self.scrollable_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
-
+    
     def update(self):
         """
         Update the scrollwheels on the scrollable frame to match contents
@@ -63,3 +63,4 @@ class ScrollableFrame(ttk.Frame):
 
         self.scrollable_canvas.update_idletasks()
         self.scrollable_canvas.config(scrollregion=self.bbox())
+    

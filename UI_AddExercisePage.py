@@ -2,12 +2,12 @@ import tkinter as tk
 from tkinter import ttk
 import random
 
-import reuseable_dropdownpopup
+import General_ReuseableDropdownPopUp
 from Process_ExercisesAPI import load_data
 from General_bindframe import bindframe
 
 
-class ModifyExercisesPage(ttk.Frame):
+class AddExercisePage(ttk.Frame):
 
 
     class APIGeneratedExerciseRow(ttk.Frame):
@@ -58,7 +58,7 @@ class ModifyExercisesPage(ttk.Frame):
                 category_names.append(self.mainline_obj.categorydata_dict[category].category)
             dropdown_choices = set(category_names)
             # creating the drop down menu for selecting a category. Note: this is a user defined function (see the function for more details)
-            reuseable_dropdownpopup.dropdownselect(self.category_selection,f"Please select what category '{self.exercise.name}' fits in to", dropdown_choices)
+            General_ReuseableDropdownPopUp.dropdownselect(self.category_selection,f"Please select what category '{self.exercise.name}' fits in to", dropdown_choices)
 
 
         def category_selection(self, selection):
@@ -78,27 +78,27 @@ class ModifyExercisesPage(ttk.Frame):
                 return
 
             # the user needs to be asked in a drop down, which format the exercise is (reps, distance, time ...)
-            # the following code will retrieve all the types (defined in a dictionary in mainline_obj.types).
+            # the following code will retrieve all the formats (defined in a dictionary in mainline_obj.exercise_formats).
             # it will then turn the aforementioned into a set which can be passed into the dropdownselector
-            type_names = []
-            for type in self.mainline_obj.exercise_formats:
-                type_names.append(self.mainline_obj.exercise_formats[type])
-            dropdown_choices = set(type_names)
+            format_names = []
+            for format in self.mainline_obj.exercise_formats:
+                format_names.append(self.mainline_obj.exercise_formats[format])
+            dropdown_choices = set(format_names)
             # creating the drop down menu for selecting a format. Note: this is a user defined function (see the function for more details)
-            reuseable_dropdownpopup.dropdownselect(self.type_selection,f"Please select what format '{self.exercise.name}' is", dropdown_choices)
+            General_ReuseableDropdownPopUp.dropdownselect(self.format_selection,f"Please select what format '{self.exercise.name}' is", dropdown_choices)
 
 
-        def type_selection(self, type_selection):
+        def format_selection(self, format_selection):
             """
             Called upon completion of the format dropdown (above)
             - selection: the selection from the previous dropdown (string) e.g., reps, distance, time ...
             """
 
-            # find the respective format (type) from the dictionary in the mainline
+            # find the respective format from the dictionary in the mainline
             self.selected_format = None
-            for type in self.mainline_obj.exercise_formats:
-                if self.mainline_obj.exercise_formats[type] == type_selection:
-                    self.selected_format = type
+            for format in self.mainline_obj.exercise_formats:
+                if self.mainline_obj.exercise_formats[format] == format_selection:
+                    self.selected_format = format
             
             # if the selected_format was not found, then the user did not make a selection
             if self.selected_format == None:
@@ -155,7 +155,7 @@ class ModifyExercisesPage(ttk.Frame):
         # remove all current rows printed on screen (they will be replaced)
         try:
             for row in self.listofrows:
-                row.exercise_frame.grid_forget()
+                row.grid_forget()
             self.listofrows=[]
         except Exception as e: 
             # exception will only occur if there are no rows

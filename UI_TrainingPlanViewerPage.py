@@ -68,15 +68,15 @@ class TrainingPlanReviewPage(ttk.Frame):
                         self.typeofexercise="custom"
                     else:
                         # creating the info display (e.g. Reps: 10 OR Time: 30)
-                        if str(self.set_obj.reps) != str(0):
+                        if str(self.set_obj.exercise_obj.format) == str(1):
                             self.typeofexercise="reps"
-                            self.setlength = str(self.set_obj.reps)
-                        elif str(self.set_obj.time) != str(0):
-                            self.typeofexercise="time"
-                            self.setlength = str(self.set_obj.time)
-                        elif str(self.set_obj.distance) != str(0):
-                            self.typeofexercise="distance"
-                            self.setlength = str(self.set_obj.distance)
+                            self.setlength = str(self.set_obj.length)
+                        elif str(self.set_obj.exercise_obj.format) == str(2):
+                            self.typeofexercise="time/s"
+                            self.setlength = str(self.set_obj.length)
+                        elif str(self.set_obj.exercise_obj.format) == str(3) or str(self.set_obj.exercise_obj.format) == str(4):
+                            self.typeofexercise="distance/m"
+                            self.setlength = str(self.set_obj.length)
 
                     # creating the set label (e.g. Set 1: Barbell Squats)
                     self.set_label = ttk.Label(self.set_frame,text=f"Set {set_index+1}: {self.setname}")
@@ -192,9 +192,9 @@ class TrainingPlanReviewPage(ttk.Frame):
         self.injectdata(self.trainingplan, self.customer)
     
     def changeplanneddate(self):
-        import reuseable_datepopup
+        import General_ReuseableDatePopUp
 
-        reuseable_datepopup.dateselect("Select Date", self.completedatechange)
+        General_ReuseableDatePopUp.dateselect("Select Date", self.completedatechange)
 
     def __init__(self, controller):
         ttk.Frame.__init__(self, controller.scrollable_frame)

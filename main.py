@@ -2,8 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 import sys, traceback
 
-import UI_HomePage, UI_TraineePage, UI_AddTraineePage, UI_TraineeInfoPage, UI_TrainingPlanViewerPage, UI_ModifyExercises
-import Process_DataStructures, scrollable_frame
+import UI_HomePage, UI_SearchTraineePage, UI_AddTraineePage, UI_TraineeInfoPage, UI_TrainingPlanViewerPage, UI_AddExercisePage
+import Process_DataStructures, General_ScrollableFrame
 
 
 class GUI():
@@ -22,9 +22,9 @@ class GUI():
         # create the "Navigate" menu
         self.navigate = tk.Menu(self.menubar, tearoff=False)
         self.navigate.add_command(label="Home", command=lambda:self.showwindow("HomePage"))
-        self.navigate.add_command(label="Trainee Search", command=lambda:self.showwindow("CustomerPage"))
+        self.navigate.add_command(label="Trainee Search", command=lambda:self.showwindow("TraineeSearchPage"))
         self.navigate.add_command(label="Add Trainee", command=lambda:self.showwindow("AddTraineePage"))
-        self.navigate.add_command(label="Add Exercise", command=lambda:self.showwindow("ModifyExercisesPage"))
+        self.navigate.add_command(label="Add Exercise", command=lambda:self.showwindow("AddExercisePage"))
         self.menubar.add_cascade(label="Navigate", menu=self.navigate)
 
         # place menu bar onto the toplevel_frame widget
@@ -41,7 +41,7 @@ class GUI():
         self.frames={}
 
         # loop through all imported GUI objects (from other files)
-        pages = [UI_HomePage.HomePage,UI_TraineePage.CustomerPage,UI_AddTraineePage.AddTraineePage, UI_TraineeInfoPage.TraineeInfoPage,UI_TrainingPlanViewerPage.TrainingPlanReviewPage, UI_ModifyExercises.ModifyExercisesPage]
+        pages = [UI_HomePage.HomePage,UI_SearchTraineePage.TraineeSearchPage,UI_AddTraineePage.AddTraineePage, UI_TraineeInfoPage.TraineeInfoPage,UI_TrainingPlanViewerPage.TrainingPlanReviewPage, UI_AddExercisePage.AddExercisePage]
         for page in pages:
             # if page already has been initalised, remove it
             if page.__name__ in self.frames:
@@ -54,6 +54,8 @@ class GUI():
 
             # for easy access, add the newly created object to a dictionary
             self.frames[page_name] = frame
+
+            self.current_frame_object = frame
            
         self.ignore_setup=False
 
@@ -69,23 +71,17 @@ class GUI():
 
     def showwindow(self, frame_name):
         '''
-        Show a requested GUI class to the user.
-        - frame_name is the name of that GUI class which needs to be shown
+        Show a requested GUI class to the user. frame_name is the name of that GUI class which needs to be shown
         '''
         # see setupwindows() method for description of self.ignore_setup
         if not self.ignore_setup:
-
-            # remove ALL frames from the viewing window
-            for frame in self.frames:
-                self.frames[frame].grid_forget()
+            # remove current frame from the display
+            self.current_frame_object.grid_forget()
             
-            # keep track of which frame is currently being shown to the user
-            self.current_frame = frame_name
+            # place the requested frame on the display
             self.current_frame_object = self.frames[frame_name]
-            
-            # place the requested frame on the window
             self.current_frame_object.grid(row=0,column=0)
-            
+
             # update ALL widget elements
             self.scrollable_frame.update()
 
@@ -114,11 +110,11 @@ class GUI():
         self.customerdata_obj = Process_DataStructures.CustomerData(self)
         self.customerdata_dict = self.customerdata_obj.traineedata
         # hard coding types of exercise codes. TODO: remove hard coding
-        self.exercise_formats = {1:"reps",3:"time",5:"distance",6:"long distance"}
+        self.exercise_formats = {1:"reps",2:"time",3:"distance",4:"long distance"}
 
         ########### INITIALISING GUI ############
         # using developer-made generalised code to define a new frame with scrollbars
-        self.scrollable_frame = scrollable_frame.ScrollableFrame(self.toplevel_frame)
+        self.scrollable_frame = General_ScrollableFrame.ScrollableFrame(self.toplevel_frame)
         self.setupmenubar()
         self.setupwindows()
         self.showwindow("HomePage") # Show top the HomePage frame

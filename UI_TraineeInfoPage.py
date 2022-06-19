@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import Process_CreateTrainingPlan
-import reuseable_datepopup
+import General_ReuseableDatePopUp
 from General_bindframe import bindframe
 
 
@@ -103,6 +103,8 @@ class TraineeInfoPage(ttk.Frame):
             # show the detailed page of the newly generated training plan
             self.mainline_obj.frames["TrainingPlanReviewPage"].injectdata(training_plan_obj, self.trainee)
             self.mainline_obj.showwindow("TrainingPlanReviewPage")
+        else:
+            tk.messagebox.showerror("Not enough exercises in database to fill requested training plan. Please add more exercises or reduce the size of the training plan")
 
     def update_goals(self):
         goal_list = []
@@ -177,7 +179,7 @@ class TraineeInfoPage(ttk.Frame):
             try:
                 setter(entry.get())
             except Exception as e:
-                messagebox.showerror(message="Unknown erro occured:\n\n" + str(e))
+                messagebox.showerror(message="Unknown error occured:\n\n" + str(e))
                 cancel(label, entry, row, column, padx, pady, sticky)
                 return
             
@@ -226,7 +228,7 @@ class TraineeInfoPage(ttk.Frame):
         self.DoB_label = ttk.Label(self.customerinfo_frame, text=f"Date of Birth: ")
         self.DoB_label.grid(row=0,column=0, padx=10, pady=15, sticky="w")
 
-        self.changeDoB_button = ttk.Button(self.customerinfo_frame, text="Change", command=lambda: reuseable_datepopup.dateselect("Select Date", self.completeDoB_datechange))
+        self.changeDoB_button = ttk.Button(self.customerinfo_frame, text="Change", command=lambda: General_ReuseableDatePopUp.dateselect("Select Date", self.completeDoB_datechange))
         self.changeDoB_button.grid(row=0,column=1)
 
         self.Email_Label = ttk.Label(self.customerinfo_frame, text=f"Email: ")
@@ -299,7 +301,7 @@ class TraineeInfoPage(ttk.Frame):
             self.planned_date = date
             self.planned_date_label["text"] = "Selected Date: " + str(self.planned_date)
 
-        self.choose_planned_date_button = ttk.Button(self.create_training_plan_frame, text="Plan a Date", command=lambda:reuseable_datepopup.dateselect("Select a date", dateselected))
+        self.choose_planned_date_button = ttk.Button(self.create_training_plan_frame, text="Plan a Date", command=lambda:General_ReuseableDatePopUp.dateselect("Select a date", dateselected))
         self.choose_planned_date_button.grid(row=3,column=0,columnspan=2,padx=15,pady=(15,5),sticky="w")
 
         self.planned_date_label = ttk.Label(self.create_training_plan_frame, text="No date selected")

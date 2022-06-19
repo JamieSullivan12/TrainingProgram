@@ -5,7 +5,7 @@ from General_bindframe import bindframe
 '''
 Contains the code for the customer page. On this page, the user can access all customer details and change them
 '''
-class CustomerPage(ttk.Frame):
+class TraineeSearchPage(ttk.Frame):
 
     class TraineeRow(ttk.Frame): 
         

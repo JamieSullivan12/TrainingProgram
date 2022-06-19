@@ -32,10 +32,7 @@ def createsessionplanPDF(trainingplan, customer_name, directory):
             for set_count,set in enumerate(station.sets):
                 pdf.set_font("helvetica", "", 13)
                 
-                # differentiating between reps, time or distance-based exercises (this information will be added to the PDF)
-                reps = set.reps
-                time = set.time
-                distance = set.distance
+                length = set.length
 
                 if set.overridename != "": 
                     setname=set.overridename
@@ -46,12 +43,12 @@ def createsessionplanPDF(trainingplan, customer_name, directory):
                     suffix_text = set.overridelength
                 else:
                     suffix_text = ""
-                    if str(reps) != "0":
-                        suffix_text = f"Reps: {reps}"
-                    elif str(time) != "0":
-                        suffix_text = f"Time: {time} s"
-                    elif str(distance) != "0":
-                        suffix_text = f"Distance: {distance} m"
+                    if set.exercise_obj.format == 1:
+                        suffix_text = f"Reps: {length}"
+                    elif set.exercise_obj.format == 2:
+                        suffix_text = f"Time: {length} s"
+                    elif set.exercise_obj.format == 3 or set.exercise_obj.format == 4:
+                        suffix_text = f"Distance: {length} m"
                 # add set to PDF    
                 pdf.cell(40,10,f"Set {str(set_count+1)}: {setname} - {suffix_text}", ln=True)
 
